@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#define SYSTEM_VERSION_GRATERTHAN_OR_EQUALTO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 
 @interface AppDelegate ()
 
@@ -17,7 +18,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000
+    if (SYSTEM_VERSION_GRATERTHAN_OR_EQUALTO(@"10.0"))
+    {
         UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
         center.delegate = self;
         [center requestAuthorizationWithOptions:(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error)
@@ -27,17 +29,20 @@
                  [[UIApplication sharedApplication] registerForRemoteNotifications];
              }
          }];
-    #elif __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+    }
+    else if (SYSTEM_VERSION_GRATERTHAN_OR_EQUALTO(@"8.0"))
+    {
         [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
         [[UIApplication sharedApplication] registerForRemoteNotifications];
-    #else
+    }
+    else
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
          (UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert)];
-    #endif
     
     [DefaultsValues setIntegerValueToUserDefaults:0 ForKey:KEY_SELECTED_MENU];
     
-    [self setRootViewControllerForUserLoggedIn:NO];
+    
+    [self setRootViewControllerForUserLoggedIn:[DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID] == 0 ? NO : YES];
     
     return YES;
 }

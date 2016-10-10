@@ -10,4 +10,9 @@
 
 @interface StoreVC : UIViewController
 
+@property (weak, nonatomic) IBOutlet UILabel *lblTitle;
+@property (weak, nonatomic) IBOutlet UIButton *btnBack;
+
+- (IBAction)btnBackClicked:(id)sender;
+
 @end

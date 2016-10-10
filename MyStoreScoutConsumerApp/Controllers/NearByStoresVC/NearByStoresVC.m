@@ -131,9 +131,12 @@
     }
 }
 
+#pragma mark - Button Click Events
+
 - (IBAction)btnMenuClicked:(id)sender
 {
     [self.view endEditing:YES];
     [self.mm_drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
 }
+
 @end

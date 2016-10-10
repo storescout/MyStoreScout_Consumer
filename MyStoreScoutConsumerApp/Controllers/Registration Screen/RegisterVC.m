@@ -48,6 +48,9 @@
                                              withPlaceHolder:@"Mobile Number"];
     [[BaseVC sharedInstance] addCustomPlaceHolderToTextField:_txtPassword
                                              withPlaceHolder:@"Password"];
+    
+    _imgProfilePicture.layer.cornerRadius = 10.0f;
+    _imgProfilePicture.clipsToBounds = YES;
 }
 
 - (void)integrateNextButtonToolBar
@@ -154,16 +157,16 @@
     
     if ([dict objectForKey:UIImagePickerControllerOriginalImage])
     {
-        UIImage* image=[dict objectForKey:UIImagePickerControllerOriginalImage];
-        UIImage* compressedImage= [[BaseVC sharedInstance] compressImage:image];
-        UIImage* finalImage=[[BaseVC sharedInstance] fixOrientation:compressedImage];
+        UIImage *image = [dict objectForKey:UIImagePickerControllerOriginalImage];
+        UIImage *compressedImage = [[BaseVC sharedInstance] compressImage:image];
+        UIImage *finalImage = [[BaseVC sharedInstance] fixOrientation:compressedImage];
         _imgProfilePicture.image = finalImage;
     }
     else if ([dict objectForKey:UIImagePickerControllerEditedImage])
     {
-        UIImage* image=[dict objectForKey:UIImagePickerControllerEditedImage];
-        UIImage* compressedImage= [[BaseVC sharedInstance] compressImage:image];
-        UIImage* finalImage=[[BaseVC sharedInstance] fixOrientation:compressedImage];
+        UIImage *image = [dict objectForKey:UIImagePickerControllerEditedImage];
+        UIImage *compressedImage = [[BaseVC sharedInstance] compressImage:image];
+        UIImage *finalImage = [[BaseVC sharedInstance] fixOrientation:compressedImage];
         _imgProfilePicture.image = finalImage;
     }
     

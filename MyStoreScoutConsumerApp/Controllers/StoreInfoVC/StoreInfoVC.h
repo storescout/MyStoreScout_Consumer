@@ -20,9 +20,11 @@
 @property (weak, nonatomic) IBOutlet UILabel *lblTimings;
 @property (weak, nonatomic) IBOutlet UIButton *btnEnter;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (weak, nonatomic) IBOutlet UIButton *btnDirections;
 
 - (IBAction)btnBackClicked:(id)sender;
 - (IBAction)btnEnterClicked:(id)sender;
+- (IBAction)btnDirectionsClicked:(id)sender;
 
 
 @end

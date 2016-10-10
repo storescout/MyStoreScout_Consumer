@@ -24,4 +24,11 @@
     [super didReceiveMemoryWarning];
 }
 
+#pragma mark - Button Click Events
+
+- (IBAction)btnBackClicked:(id)sender
+{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
 @end

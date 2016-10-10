@@ -7,6 +7,7 @@
 //
 
 #import "ShoppingListVC.h"
+#import "ShoppingListCell.h"
 
 @interface ShoppingListVC ()
 
@@ -17,11 +18,53 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.00001 * NSEC_PER_SEC), dispatch_get_main_queue(),^
+    {
+        _vwAddItem.layer.cornerRadius = 10.0f;
+        _vwAddItem.clipsToBounds = YES;
+        
+        [[BaseVC sharedInstance] addBottomLineToTextFields:@[_txtAddItem]];
+        
+        [[BaseVC sharedInstance] addCustomPlaceHolderToTextField:_txtAddItem
+                                                 withPlaceHolder:@"Add item name"];
+    });
+    
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+    tapGesture.delegate = self;
+    [_vwAddItemContainer addGestureRecognizer:tapGesture];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
+}
+
+#pragma mark - Tap Gesture Handling Method
+
+- (void)handleTap:(UITapGestureRecognizer *)sender
+{
+    if (!CGRectContainsRect(_vwAddItem.frame, CGRectMake([sender locationInView:self.view].x, [sender locationInView:self.view].y, 1, 1)))
+    {
+        [UIView transitionWithView:_vwAddItemContainer
+                          duration:0.4
+                           options:UIViewAnimationOptionTransitionFlipFromRight
+                        animations:^{
+                            _vwAddItemContainer.hidden = !_vwAddItemContainer.hidden;
+                        }
+                        completion:^(BOOL finished) {
+                            [self.view endEditing:YES];
+                            _txtAddItem.enabled = NO;
+                        }];
+    }
+}
+
+#pragma mark - UITextField Delegate Methods
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [textField resignFirstResponder];
+    return YES;
 }
 
 #pragma mark - UITableView Delegate Methods
@@ -52,11 +95,28 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    ShoppingListCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     
     cell.contentView.backgroundColor = indexPath.row % 2 == 0 ? [UIColor whiteColor] : rgb(242, 242, 242, 1.0);
     
+    [cell.btnIsChecked setImage:[UIImage imageNamed:indexPath.row % 2 == 0 ? @"IMG_UNCHECKED" : @"IMG_CHECKED"] forState:UIControlStateNormal];
+    
+    cell.btnIsChecked.tag = indexPath.row;
+    
+    [cell.btnIsChecked addTarget:self
+                          action:@selector(handleCheckBoxTap:)
+                forControlEvents:UIControlEventTouchUpInside];
+    
     return cell;
+}
+
+#pragma mark - Check Box Handling Events
+
+- (IBAction)handleCheckBoxTap:(UIButton *)sender
+{
+    NSLog(@"I have pressed button at index %ld",(long)[sender tag]);
+    
+    [sender setImage:[UIImage imageNamed:@"IMG_CHECKED"] forState:UIControlStateNormal];
 }
 
 #pragma mark - UIScrollView Delegate Methods
@@ -122,15 +182,45 @@
                         }
                         completion:NULL];
     }
-    [self.navigationController pushViewController:STORYBOARD_ID(@"idStoreInfoVC") animated:YES];
+    [UIView transitionWithView:_vwAddItemContainer
+                      duration:0.4
+                       options:UIViewAnimationOptionTransitionFlipFromLeft
+                    animations:^{
+                        _vwAddItemContainer.hidden = !_vwAddItemContainer.hidden;
+                        _txtAddItem.enabled = !_txtAddItem.enabled;
+                    }
+                    completion:^(BOOL finished) {
+                        [_txtAddItem becomeFirstResponder];
+                    }];
 }
 
 - (IBAction)btnSelectClicked:(id)sender
 {
+    [self.navigationController pushViewController:STORYBOARD_ID(@"idStoreInfoVC") animated:YES];
 }
 
 - (IBAction)btnDeleteAllClicked:(id)sender
 {
+}
+
+- (IBAction)btnSaveClicked:(id)sender
+{
+}
+
+- (IBAction)btnCancelClicked:(id)sender
+{
+    [UIView transitionWithView:_vwAddItemContainer
+                      duration:0.4
+                       options:UIViewAnimationOptionTransitionFlipFromRight
+                    animations:^{
+                        _vwAddItemContainer.hidden = !_vwAddItemContainer.hidden;
+                    }
+                    completion:^(BOOL finished) {
+                        
+                        [self.view endEditing:YES];
+                        
+                        _txtAddItem.enabled = NO;
+                    }];
 }
 
 @end

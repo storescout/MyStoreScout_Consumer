@@ -12,6 +12,7 @@
 		E45E1C511DA8CD390051C610 /* StoreInfoVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E45E1C501DA8CD390051C610 /* StoreInfoVC.m */; };
 		E45E1C531DA8D0660051C610 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45E1C521DA8D0660051C610 /* CoreGraphics.framework */; };
 		E47719221DAB56D1001B12E9 /* StoreVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E47719211DAB56D1001B12E9 /* StoreVC.m */; };
+		E47719251DABA4C8001B12E9 /* ShoppingListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E47719241DABA4C8001B12E9 /* ShoppingListCell.m */; };
 		E492D17B1DA766F200EFE2F7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E492D1771DA766F200EFE2F7 /* ViewController.m */; };
 		E492D17C1DA766F200EFE2F7 /* RegisterVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E492D17A1DA766F200EFE2F7 /* RegisterVC.m */; };
 		E492D1811DA77C1900EFE2F7 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E492D1801DA77C1900EFE2F7 /* CoreLocation.framework */; };
@@ -88,6 +89,8 @@
 		E45E1C521DA8D0660051C610 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		E47719201DAB56D1001B12E9 /* StoreVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StoreVC.h; sourceTree = "<group>"; };
 		E47719211DAB56D1001B12E9 /* StoreVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StoreVC.m; sourceTree = "<group>"; };
+		E47719231DABA4C8001B12E9 /* ShoppingListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShoppingListCell.h; sourceTree = "<group>"; };
+		E47719241DABA4C8001B12E9 /* ShoppingListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShoppingListCell.m; sourceTree = "<group>"; };
 		E492D1761DA766F200EFE2F7 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		E492D1771DA766F200EFE2F7 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		E492D1791DA766F200EFE2F7 /* RegisterVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegisterVC.h; sourceTree = "<group>"; };
@@ -355,12 +358,12 @@
 		E4D016CF1DA3BBB40007524D /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				E477191F1DAB56C4001B12E9 /* StoreVC */,
-				E45E1C4E1DA8CD280051C610 /* StoreInfoVC */,
 				E492D1751DA766F200EFE2F7 /* Login Screen */,
 				E492D1781DA766F200EFE2F7 /* Registration Screen */,
 				E45E1C4A1DA8BB9D0051C610 /* MenuVC */,
 				E492D1841DA79A4F00EFE2F7 /* NearByStoresVC */,
+				E477191F1DAB56C4001B12E9 /* StoreVC */,
+				E45E1C4E1DA8CD280051C610 /* StoreInfoVC */,
 				E492D1881DA79A9400EFE2F7 /* ShoppingListVC */,
 				E492D18C1DA7B57600EFE2F7 /* ProfileVC */,
 			);
@@ -450,6 +453,8 @@
 			children = (
 				E4D016F41DA3BC870007524D /* UIUnderlinedButton.h */,
 				E4D016F51DA3BC870007524D /* UIUnderlinedButton.m */,
+				E47719231DABA4C8001B12E9 /* ShoppingListCell.h */,
+				E47719241DABA4C8001B12E9 /* ShoppingListCell.m */,
 			);
 			path = "Helper Class";
 			sourceTree = "<group>";
@@ -749,6 +754,7 @@
 				E4D017741DA3BC870007524D /* UIView+WebCacheOperation.m in Sources */,
 				E4D017541DA3BC870007524D /* BaseVC.m in Sources */,
 				E4D0176C1DA3BC870007524D /* SDWebImageManager.m in Sources */,
+				E47719251DABA4C8001B12E9 /* ShoppingListCell.m in Sources */,
 				E4D017811DA3BC870007524D /* WebServiceConnector.m in Sources */,
 				E4D0175F1DA3BC870007524D /* User.m in Sources */,
 				E4D017561DA3BC870007524D /* LeftTriangleView.m in Sources */,

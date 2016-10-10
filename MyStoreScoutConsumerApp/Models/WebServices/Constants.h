@@ -17,9 +17,9 @@
 
 /* ============================================================================ */
 #pragma mark - Web Service Requests
-#define Server_URL    "http://clientapp.narola.online/pg/mystorescout/WS/MobileAppService.php?Service="
+#define Server_URL    "http://54.70.249.239/MyStoreScoutWS/MobileAppService.php?Service="
 
-#define Image_Path "http://clientapp.narola.online/pg/mystorescout/"
+#define Image_Path "http://54.70.249.239/"
 
 
 #define URL_Login [NSString stringWithFormat:@"%sLogin",Server_URL]

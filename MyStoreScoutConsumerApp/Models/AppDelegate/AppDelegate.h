@@ -15,5 +15,7 @@
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) MMDrawerController *drawerController;
 
+- (void)setRootViewControllerForUserLoggedIn:(BOOL)isLoggedin;
+
 @end
 

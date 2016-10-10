@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "NearByStoresVC.h"
 
 @interface ViewController ()
 
@@ -18,7 +19,7 @@
 {
     [super viewDidLoad];
     
-    dispatch_async(dispatch_get_main_queue(),^
+    dispatch_async(dispatch_get_main_queue(), ^
     {
        [self setLayout];
     });
@@ -73,8 +74,7 @@
 
 - (IBAction)btnLoginClicked:(id)sender
 {
-    [self.navigationController pushViewController:STORYBOARD_ID(@"idStoresVC") animated:YES];
-    return;
+//    [self.navigationController pushViewController:STORYBOARD_ID(@"idStoresVC") animated:YES];
     
     [self.view endEditing:YES];
     
@@ -89,6 +89,7 @@
                                                @"username":_txtusername.text,
                                                @"password":_txtPassword.text,
                                                @"role_id":@"1",
+                                               @"is_testdata":@"1",
                                                @"device_token":strDeviceToken.length > 0 ? strDeviceToken : @"",
                                                }
                                   withObject:self
@@ -125,12 +126,11 @@
     {
         if (STATUS([[sender responseDict] valueForKey:@"status"]))
         {
-//            StoreVC *storeVC = STORYBOARD_ID(@"idStoreVC");
-//            User *objUser = [[sender responseArray] objectAtIndex:0];
-//            [DefaultsValues setIntegerValueToUserDefaults:objUser.userIdentifier ForKey:KEY_USER_ID];
-//            [DefaultsValues setCustomObjToUserDefaults:objUser ForKey:KEY_USER];
-//            storeVC.objUser = objUser;
-//            [self.navigationController pushViewController:storeVC animated:YES];
+            NearByStoresVC *storeVC = STORYBOARD_ID(@"idStoresVC");
+            User *objUser = [[sender responseArray] objectAtIndex:0];
+            [DefaultsValues setIntegerValueToUserDefaults:objUser.userIdentifier ForKey:KEY_USER_ID];
+            [DefaultsValues setCustomObjToUserDefaults:objUser ForKey:KEY_USER];
+            [self.navigationController pushViewController:storeVC animated:YES];
         }
         else
         {
@@ -148,17 +148,19 @@
                                                                       preferredStyle:UIAlertControllerStyleAlert];
     
     [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField)
-     {
-         [textField addTarget:self
-                       action:@selector(textFieldTextDidChanged:)
-             forControlEvents:UIControlEventEditingChanged];
-         
-         textField.placeholder = @"Enter your email address here";
-         textField.clearButtonMode = UITextFieldViewModeWhileEditing;
-         textField.keyboardType = UIKeyboardTypeEmailAddress;
-         textField.autocorrectionType = UITextAutocorrectionTypeNo;
-         textField.tintColor = rgb(85, 85, 85, 1.0);
-     }];
+    {
+        [textField addTarget:self
+                      action:@selector(textFieldTextDidChanged:)
+            forControlEvents:UIControlEventEditingChanged];
+
+        [[BaseVC sharedInstance] addCustomPlaceHolderToTextField:textField
+                                                 withPlaceHolder:@"Enter your email address here"];
+
+        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        textField.keyboardType = UIKeyboardTypeEmailAddress;
+        textField.autocorrectionType = UITextAutocorrectionTypeNo;
+        textField.tintColor = rgb(85, 85, 85, 1.0);
+    }];
     
     UIAlertAction *btnReset = [UIAlertAction actionWithTitle:@"RESET"
                                                        style:UIAlertActionStyleDefault
@@ -185,7 +187,7 @@
     
     dispatch_async(dispatch_get_main_queue(),^
     {
-       [self presentViewController:alertController animated:YES completion:nil];
+        [self presentViewController:alertController animated:YES completion:nil];
     });
 }
 

@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ProfileVC : UIViewController <UITextFieldDelegate>
+@interface ProfileVC : UIViewController <UITextFieldDelegate, UIActionSheetDelegate, UIGestureRecognizerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIImageView *imgProfilePicture;
 @property (weak, nonatomic) IBOutlet UIView *vwImageContainer;
