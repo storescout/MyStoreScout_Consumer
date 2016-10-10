@@ -1,0 +1,1 @@
+# MyStoreScout_Consumer
