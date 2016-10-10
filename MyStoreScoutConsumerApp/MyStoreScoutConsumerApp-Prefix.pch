@@ -1,0 +1,76 @@
+//
+//  MyStoreScoutConsumerApp-Prefix.pch
+//  MyStoreScoutConsumerApp
+//
+//  Created by C205 on 04/10/16.
+//  Copyright © 2016 C205. All rights reserved.
+//
+
+#ifndef MyStoreScoutConsumerApp_Prefix_pch
+#define MyStoreScoutConsumerApp_Prefix_pch
+
+#import "BaseVC.h"
+#import "NSString+Extensions.h"
+#import "AZNotification.h"
+#import "NetworkAvailability.h"
+#import "WebServiceConnector.h"
+#import "WebServiceDataAdaptor.h"
+#import "WebServiceResponse.h"
+#import "SVProgressHUD.h"
+#import "DefaultsValues.h"
+#import "UIViewController+MMDrawerController.h"
+#import "CNTrace.h"
+#import "UIImageView+WebCache.h"
+#import "User.h"
+#import "AppDelegate.h"
+#import "TopTriangleView.h"
+#import "BottomTriangleView.h"
+#import "LeftTriangleView.h"
+#import "RightTriangleView.h"
+
+#define SYSTEM_VERSION_GRATERTHAN_OR_EQUALTO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+
+#define APP_CONTEXT ((AppDelegate*)[[UIApplication sharedApplication] delegate])
+
+#define SCREEN_WIDTH ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.width : [[UIScreen mainScreen] bounds].size.height)
+#define SCREEN_HEIGHT ((([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait) || ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)) ? [[UIScreen mainScreen] bounds].size.height : [[UIScreen mainScreen] bounds].size.width)
+
+#define POINT_HEIGHT 25
+#define POINT_WIDTH 25
+
+#define SMALL_SIZE 150
+#define BIG_SIZE 300
+
+#define Label_Width 70
+#define Label_Height 25
+
+#define BEACON_WIDTH 50
+#define BEACON_HEIGHT 50
+
+#define SMALL_SPACE 10
+
+#define HALF(UNIT) UNIT/2
+
+#define DEFAULT_STROKE_COLOR [UIColor colorWithRed:255/255.0 green:183/255.0 blue:184/255.0 alpha:1.0]
+#define WALKING_PATH_STROKE_COLOR [UIColor blackColor]
+
+#define APP_NAME @"MyStoreScout"
+
+#define NETWORK_ERR @"Please check your internet connectivity"
+
+#define KEY_DEVICE_TOKEN @"DeviceToken"
+#define KEY_USER_ID @"USER_ID"
+#define KEY_USER @"OBJ_USER"
+#define KEY_SELECTED_MENU @"SELECTED_MENU_ITEM"
+
+#define rgb(r,g,b,a) [UIColor colorWithRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:a]
+
+#define DEFAULT_PROFILE_IMAGE [UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]
+
+#define POINT_COLOR [UIColor colorWithRed:81/255.0 green:82/255.0 blue:81/255.0 alpha:1.0]
+
+#define STORYBOARD_ID(identifier) [self.storyboard instantiateViewControllerWithIdentifier:identifier]
+
+#define STATUS(status) [status isEqualToString:@"success"] ? 1 : 0
+
+#endif

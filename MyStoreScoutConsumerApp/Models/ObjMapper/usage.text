@@ -1,0 +1,18 @@
+  // Get data from NSUserDefaults. If not available, read it from file and
+    // save to NSUserDefaults
+    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    self.rooms = [defaults rm_customObjectForKey:@"SAVED_DATA"];
+    
+    if (!self.rooms) {
+        NSString* path = [[NSBundle mainBundle] pathForResource:@"featured_destinations"
+                                                         ofType:@"json"];
+        
+        // Update the rooms with onboard JSON
+        NSData *theData = [NSData dataWithContentsOfFile:path];
+        id responseJSON = [NSJSONSerialization JSONObjectWithData:theData options:NSJSONReadingMutableContainers error:nil];
+        id responseJSONResult = [responseJSON objectForKey:@"result"];
+        self.rooms = [ObjMapper mutableArrayOfClass:[RMRoom class]
+                             fromArrayOfDictionary:responseJSONResult];
+        
+        [defaults rm_setCustomObject:self.rooms forKey:@"SAVED_DATA"];
+    }
