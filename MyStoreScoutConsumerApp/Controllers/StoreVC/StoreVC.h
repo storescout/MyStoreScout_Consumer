@@ -7,11 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Store.h"
 
 @interface StoreVC : UIViewController
 
 @property (weak, nonatomic) IBOutlet UILabel *lblTitle;
 @property (weak, nonatomic) IBOutlet UIButton *btnBack;
+
+@property (nonatomic, strong) Store *objStore;
 
 - (IBAction)btnBackClicked:(id)sender;
 

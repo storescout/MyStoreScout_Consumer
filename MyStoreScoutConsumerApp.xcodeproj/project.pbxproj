@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		E3763578CC5390350D7CFFC9 /* libPods-MyStoreScoutConsumerApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DEEA58F3C27D9F1F99D0BE9 /* libPods-MyStoreScoutConsumerApp.a */; };
+		E458913D1DACBEDA001F55CF /* Racks.m in Sources */ = {isa = PBXBuildFile; fileRef = E458913C1DACBEDA001F55CF /* Racks.m */; };
+		E45891401DACE6AB001F55CF /* StoreImagesCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E458913F1DACE6AB001F55CF /* StoreImagesCell.m */; };
 		E45E1C4D1DA8BBAF0051C610 /* MenuVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E45E1C4C1DA8BBAF0051C610 /* MenuVC.m */; };
 		E45E1C511DA8CD390051C610 /* StoreInfoVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E45E1C501DA8CD390051C610 /* StoreInfoVC.m */; };
 		E45E1C531DA8D0660051C610 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45E1C521DA8D0660051C610 /* CoreGraphics.framework */; };
@@ -82,6 +84,10 @@
 		3DC059275D65588637FEA1FF /* Pods-MyStoreScoutConsumerApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyStoreScoutConsumerApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MyStoreScoutConsumerApp/Pods-MyStoreScoutConsumerApp.debug.xcconfig"; sourceTree = "<group>"; };
 		5074D9F999ECAB45118F87E1 /* Pods-MyStoreScoutConsumerApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyStoreScoutConsumerApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-MyStoreScoutConsumerApp/Pods-MyStoreScoutConsumerApp.release.xcconfig"; sourceTree = "<group>"; };
 		6DEEA58F3C27D9F1F99D0BE9 /* libPods-MyStoreScoutConsumerApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MyStoreScoutConsumerApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E458913B1DACBEDA001F55CF /* Racks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Racks.h; sourceTree = "<group>"; };
+		E458913C1DACBEDA001F55CF /* Racks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Racks.m; sourceTree = "<group>"; };
+		E458913E1DACE6AB001F55CF /* StoreImagesCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StoreImagesCell.h; sourceTree = "<group>"; };
+		E458913F1DACE6AB001F55CF /* StoreImagesCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StoreImagesCell.m; sourceTree = "<group>"; };
 		E45E1C4B1DA8BBAF0051C610 /* MenuVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuVC.h; sourceTree = "<group>"; };
 		E45E1C4C1DA8BBAF0051C610 /* MenuVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuVC.m; sourceTree = "<group>"; };
 		E45E1C4F1DA8CD390051C610 /* StoreInfoVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StoreInfoVC.h; sourceTree = "<group>"; };
@@ -362,8 +368,8 @@
 				E492D1781DA766F200EFE2F7 /* Registration Screen */,
 				E45E1C4A1DA8BB9D0051C610 /* MenuVC */,
 				E492D1841DA79A4F00EFE2F7 /* NearByStoresVC */,
-				E477191F1DAB56C4001B12E9 /* StoreVC */,
 				E45E1C4E1DA8CD280051C610 /* StoreInfoVC */,
+				E477191F1DAB56C4001B12E9 /* StoreVC */,
 				E492D1881DA79A9400EFE2F7 /* ShoppingListVC */,
 				E492D18C1DA7B57600EFE2F7 /* ProfileVC */,
 			);
@@ -455,6 +461,8 @@
 				E4D016F51DA3BC870007524D /* UIUnderlinedButton.m */,
 				E47719231DABA4C8001B12E9 /* ShoppingListCell.h */,
 				E47719241DABA4C8001B12E9 /* ShoppingListCell.m */,
+				E458913E1DACE6AB001F55CF /* StoreImagesCell.h */,
+				E458913F1DACE6AB001F55CF /* StoreImagesCell.m */,
 			);
 			path = "Helper Class";
 			sourceTree = "<group>";
@@ -473,6 +481,8 @@
 		E4D016FB1DA3BC870007524D /* Object Files */ = {
 			isa = PBXGroup;
 			children = (
+				E458913B1DACBEDA001F55CF /* Racks.h */,
+				E458913C1DACBEDA001F55CF /* Racks.m */,
 				E4D016FC1DA3BC870007524D /* Store.h */,
 				E4D016FD1DA3BC870007524D /* Store.m */,
 				E4D016FE1DA3BC870007524D /* StoreImages.h */,
@@ -796,9 +806,11 @@
 				E4D0176A1DA3BC870007524D /* SDWebImageDownloader.m in Sources */,
 				E4D0176E1DA3BC870007524D /* UIButton+WebCache.m in Sources */,
 				E4D017611DA3BC870007524D /* NSObject+Copyable.m in Sources */,
+				E458913D1DACBEDA001F55CF /* Racks.m in Sources */,
 				E4D017791DA3BC870007524D /* SVIndefiniteAnimatedView.m in Sources */,
 				E4D017661DA3BC870007524D /* NSData+ImageContentType.m in Sources */,
 				E4D017601DA3BC870007524D /* NSObject+Archivable.m in Sources */,
+				E45891401DACE6AB001F55CF /* StoreImagesCell.m in Sources */,
 				E4D017531DA3BC870007524D /* UIColor+Additions.m in Sources */,
 				E4D017671DA3BC870007524D /* SDImageCache.m in Sources */,
 				E45E1C511DA8CD390051C610 /* StoreInfoVC.m in Sources */,

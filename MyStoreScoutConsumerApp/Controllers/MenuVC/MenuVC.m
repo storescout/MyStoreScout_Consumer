@@ -29,6 +29,21 @@
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     tapGesture.delegate = self;
     [_imgProfilePicture addGestureRecognizer:tapGesture];
+    
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    User *objUser = [DefaultsValues getCustomObjFromUserDefaults_ForKey:KEY_USER];
+    
+    _lblFullName.text = [NSString stringWithFormat:@"%@ %@",objUser.firstName, objUser.lastName];
+    
+    NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
+    
+    [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
+                          placeholderImage:[UIImage imageNamed:@""]];
 }
 
 - (void)didReceiveMemoryWarning
@@ -40,6 +55,8 @@
 
 - (void)handleTap:(UITapGestureRecognizer *)sender
 {
+    [DefaultsValues setIntegerValueToUserDefaults:-1 ForKey:KEY_SELECTED_MENU];
+    [_tblMenu reloadData];
     [self navigateToViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"idProfileVC"]];
 }
 
@@ -99,6 +116,8 @@
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
                                                           [alert dismissViewControllerAnimated:YES completion:nil];
+                                                          [DefaultsValues removeObjectForKey:KEY_USER_ID];
+                                                          [DefaultsValues removeObjectForKey:KEY_USER];
                                                           [APP_CONTEXT setRootViewControllerForUserLoggedIn:NO];
                                                       }];
     

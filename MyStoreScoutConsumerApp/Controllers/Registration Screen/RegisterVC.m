@@ -145,7 +145,13 @@
     else if(buttonIndex == 0)
     {
         isImageSet = NO;
-        [_imgProfilePicture setImage:DEFAULT_PROFILE_IMAGE];
+        [UIView transitionWithView:_imgProfilePicture
+                          duration:0.4
+                           options:UIViewAnimationOptionTransitionFlipFromLeft
+                        animations:^{
+                            [_imgProfilePicture setImage:DEFAULT_PROFILE_IMAGE];
+                        } completion:nil];
+
     }
 }
 
@@ -160,17 +166,33 @@
         UIImage *image = [dict objectForKey:UIImagePickerControllerOriginalImage];
         UIImage *compressedImage = [[BaseVC sharedInstance] compressImage:image];
         UIImage *finalImage = [[BaseVC sharedInstance] fixOrientation:compressedImage];
-        _imgProfilePicture.image = finalImage;
+        [picker dismissViewControllerAnimated:YES
+                                   completion:^{
+                                       [UIView transitionWithView:_imgProfilePicture
+                                                         duration:0.4
+                                                          options:UIViewAnimationOptionTransitionFlipFromLeft
+                                                       animations:^{
+                                                           _imgProfilePicture.image = finalImage;
+                                                       } completion:nil];
+                                   }];
     }
     else if ([dict objectForKey:UIImagePickerControllerEditedImage])
     {
         UIImage *image = [dict objectForKey:UIImagePickerControllerEditedImage];
         UIImage *compressedImage = [[BaseVC sharedInstance] compressImage:image];
         UIImage *finalImage = [[BaseVC sharedInstance] fixOrientation:compressedImage];
-        _imgProfilePicture.image = finalImage;
+        [picker dismissViewControllerAnimated:YES
+                                   completion:^{
+                                       [UIView transitionWithView:_imgProfilePicture
+                                                         duration:0.4
+                                                          options:UIViewAnimationOptionTransitionFlipFromLeft
+                                                       animations:^{
+                                                           _imgProfilePicture.image = finalImage;
+                                                       } completion:nil];
+                                   }];
     }
     
-    [picker dismissViewControllerAnimated:YES completion:nil];
+//    [picker dismissViewControllerAnimated:YES completion:nil];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
     {
@@ -206,6 +228,103 @@
 - (IBAction)btnBackClicked:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)btnSignUpClicked:(id)sender
+{
+    [self.view endEditing:YES];
+    
+    if ([_txtUsername.text isValid] && [_txtEmailAddress.text isValid] && [_txtMobileNumber.text isValid] && [_txtPassword.text isValid])
+    {
+        if ([_txtEmailAddress.text isValidEmail])
+        {
+            if ([_txtMobileNumber.text isValidPhoneNumber])
+            {
+                if ([_txtPassword.text isValidPassword])
+                {
+                    if([[NetworkAvailability instance] isReachable])
+                    {
+                        NSString *strDeviceToken = [DefaultsValues getStringValueFromUserDefaults_ForKey:KEY_DEVICE_TOKEN];
+                        NSString *strDeviceUDID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+                        
+                        [[WebServiceConnector alloc]init:URL_Registration
+                                          withParameters:@{
+                                                           @"firstname":@"Bhargav",
+                                                           @"lastname":@"Kukadiya",
+                                                           @"username":_txtUsername.text,
+                                                           @"role_id":@"1",
+                                                           @"password":_txtPassword.text,
+                                                           @"email_id":_txtEmailAddress.text,
+                                                           @"phone_no":_txtMobileNumber.text,
+                                                           @"profile_pic":isImageSet ? strBase64 : @"",
+                                                           @"device_token":strDeviceToken.length > 0 ? strDeviceToken : @"",
+                                                           @"device_udid":strDeviceUDID,
+                                                           @"device_made":@"iOS",
+                                                           @"is_testdata":@"1"
+                                                           }
+                                              withObject:self
+                                            withSelector:@selector(DisplayResults:)
+                                          forServiceType:@"JSON"
+                                          showDisplayMsg:RegistrationMsg];
+                    }
+                    else
+                    {
+                        [AZNotification showNotificationWithTitle:NETWORK_ERR
+                                                       controller:self
+                                                 notificationType:AZNotificationTypeError];
+                    }
+                }
+                else
+                {
+                    [[BaseVC sharedInstance] addAlertBoxWithText:@"Please provide valid password.\nUse minimum 8 and maximum 16 characters with at least 1 Alphabet, 1 Number and 1 Special Character."
+                                                            toVC:self];
+                }
+            }
+            else
+            {
+                [AZNotification showNotificationWithTitle:@"Please enter valid phone number"
+                                               controller:self
+                                         notificationType:AZNotificationTypeError];
+            }
+        }
+        else
+        {
+            [AZNotification showNotificationWithTitle:@"Please enter valid email address"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+        }
+    }
+    else
+    {
+        [AZNotification showNotificationWithTitle:@"Please fill all mandatory fields"
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
+}
+
+- (void)DisplayResults:(id)sender
+{
+    [SVProgressHUD dismiss];
+    if ([sender responseCode] != 100)
+    {
+        [AZNotification showNotificationWithTitle:[sender responseError]
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
+    else
+    {
+        if (STATUS([[sender responseDict] valueForKey:@"status"]))
+        {
+            User *objUser = [[sender responseArray] objectAtIndex:0];
+            [DefaultsValues setIntegerValueToUserDefaults:objUser.userIdentifier ForKey:KEY_USER_ID];
+            [DefaultsValues setCustomObjToUserDefaults:objUser ForKey:KEY_USER];
+            [self.navigationController pushViewController:STORYBOARD_ID(@"idStoresVC") animated:YES];
+        }
+        else
+        {
+            [AZNotification showNotificationWithTitle:[[sender responseDict] valueForKey:@"message"] controller:self notificationType:AZNotificationTypeError];
+        }
+    }
 }
 
 @end

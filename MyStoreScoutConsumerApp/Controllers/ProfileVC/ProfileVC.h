@@ -20,8 +20,10 @@
 @property (weak, nonatomic) IBOutlet UITextField *txtNewPassword;
 @property (weak, nonatomic) IBOutlet UITextField *txtConfirmPassword;
 @property (weak, nonatomic) IBOutlet UIView *vwChangePasswordContainer;
+@property (weak, nonatomic) IBOutlet UIButton *btnSave;
 
 - (IBAction)btnEditClicked:(id)sender;
 - (IBAction)btnBackClicked:(id)sender;
+- (IBAction)btnSaveClicked:(id)sender;
 
 @end

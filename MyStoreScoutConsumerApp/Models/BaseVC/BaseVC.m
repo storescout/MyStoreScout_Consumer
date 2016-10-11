@@ -32,8 +32,7 @@
                                                              preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *btnOK = [UIAlertAction actionWithTitle:@"OK"
                                                     style:UIAlertActionStyleDefault
-                                                  handler:^(UIAlertAction * action) {
-                                                  }];
+                                                  handler:^(UIAlertAction * action) {}];
     [alert addAction:btnOK];
     [VC presentViewController:alert animated:YES completion:nil];
 }

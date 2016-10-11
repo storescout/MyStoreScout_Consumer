@@ -1,11 +1,12 @@
 //
 //  Store.m
 //
-//  Created by C205  on 29/09/16
+//  Created by C205  on 11/10/16
 //  Copyright (c) 2016 __MyCompanyName__. All rights reserved.
 //
 
 #import "Store.h"
+#import "Racks.h"
 #import "StoreImages.h"
 
 
@@ -14,10 +15,13 @@ NSString *const kStoreIsDeleted = @"is_deleted";
 NSString *const kStoreStoreName = @"store_name";
 NSString *const kStoreContactNo = @"contact_no";
 NSString *const kStoreModified = @"modified";
+NSString *const kStoreLongitude = @"longitude";
 NSString *const kStoreWidth = @"width";
 NSString *const kStorePositionY = @"position_y";
-NSString *const kStoreStartTime = @"start_time";
+NSString *const kStoreLatitude = @"latitude";
 NSString *const kStoreStoreAddress = @"store_address";
+NSString *const kStoreStartTime = @"start_time";
+NSString *const kStoreRacks = @"racks";
 NSString *const kStoreHeight = @"height";
 NSString *const kStoreEndTime = @"end_time";
 NSString *const kStoreIsTestdata = @"is_testdata";
@@ -40,10 +44,13 @@ NSString *const kStorePositionX = @"position_x";
 @synthesize storeName = _storeName;
 @synthesize contactNo = _contactNo;
 @synthesize modified = _modified;
+@synthesize longitude = _longitude;
 @synthesize width = _width;
 @synthesize positionY = _positionY;
-@synthesize startTime = _startTime;
+@synthesize latitude = _latitude;
 @synthesize storeAddress = _storeAddress;
+@synthesize startTime = _startTime;
+@synthesize racks = _racks;
 @synthesize height = _height;
 @synthesize endTime = _endTime;
 @synthesize isTestdata = _isTestdata;
@@ -71,10 +78,25 @@ NSString *const kStorePositionX = @"position_x";
             self.storeName = [self objectOrNilForKey:kStoreStoreName fromDictionary:dict];
             self.contactNo = [self objectOrNilForKey:kStoreContactNo fromDictionary:dict];
             self.modified = [self objectOrNilForKey:kStoreModified fromDictionary:dict];
+            self.longitude = [self objectOrNilForKey:kStoreLongitude fromDictionary:dict];
             self.width = [self objectOrNilForKey:kStoreWidth fromDictionary:dict];
             self.positionY = [self objectOrNilForKey:kStorePositionY fromDictionary:dict];
-            self.startTime = [self objectOrNilForKey:kStoreStartTime fromDictionary:dict];
+            self.latitude = [self objectOrNilForKey:kStoreLatitude fromDictionary:dict];
             self.storeAddress = [self objectOrNilForKey:kStoreStoreAddress fromDictionary:dict];
+            self.startTime = [self objectOrNilForKey:kStoreStartTime fromDictionary:dict];
+    NSObject *receivedRacks = [dict objectForKey:kStoreRacks];
+    NSMutableArray *parsedRacks = [NSMutableArray array];
+    if ([receivedRacks isKindOfClass:[NSArray class]]) {
+        for (NSDictionary *item in (NSArray *)receivedRacks) {
+            if ([item isKindOfClass:[NSDictionary class]]) {
+                [parsedRacks addObject:[Racks modelObjectWithDictionary:item]];
+            }
+       }
+    } else if ([receivedRacks isKindOfClass:[NSDictionary class]]) {
+       [parsedRacks addObject:[Racks modelObjectWithDictionary:(NSDictionary *)receivedRacks]];
+    }
+
+    self.racks = [NSArray arrayWithArray:parsedRacks];
             self.height = [self objectOrNilForKey:kStoreHeight fromDictionary:dict];
             self.endTime = [self objectOrNilForKey:kStoreEndTime fromDictionary:dict];
             self.isTestdata = [self objectOrNilForKey:kStoreIsTestdata fromDictionary:dict];
@@ -109,10 +131,23 @@ NSString *const kStorePositionX = @"position_x";
     [mutableDict setValue:self.storeName forKey:kStoreStoreName];
     [mutableDict setValue:self.contactNo forKey:kStoreContactNo];
     [mutableDict setValue:self.modified forKey:kStoreModified];
+    [mutableDict setValue:self.longitude forKey:kStoreLongitude];
     [mutableDict setValue:self.width forKey:kStoreWidth];
     [mutableDict setValue:self.positionY forKey:kStorePositionY];
-    [mutableDict setValue:self.startTime forKey:kStoreStartTime];
+    [mutableDict setValue:self.latitude forKey:kStoreLatitude];
     [mutableDict setValue:self.storeAddress forKey:kStoreStoreAddress];
+    [mutableDict setValue:self.startTime forKey:kStoreStartTime];
+NSMutableArray *tempArrayForRacks = [NSMutableArray array];
+    for (NSObject *subArrayObject in self.racks) {
+        if([subArrayObject respondsToSelector:@selector(dictionaryRepresentation)]) {
+            // This class is a model object
+            [tempArrayForRacks addObject:[subArrayObject performSelector:@selector(dictionaryRepresentation)]];
+        } else {
+            // Generic object
+            [tempArrayForRacks addObject:subArrayObject];
+        }
+    }
+    [mutableDict setValue:[NSArray arrayWithArray:tempArrayForRacks] forKey:@"kStoreRacks"];
     [mutableDict setValue:self.height forKey:kStoreHeight];
     [mutableDict setValue:self.endTime forKey:kStoreEndTime];
     [mutableDict setValue:self.isTestdata forKey:kStoreIsTestdata];
@@ -158,10 +193,13 @@ NSMutableArray *tempArrayForStoreImages = [NSMutableArray array];
     self.storeName = [aDecoder decodeObjectForKey:kStoreStoreName];
     self.contactNo = [aDecoder decodeObjectForKey:kStoreContactNo];
     self.modified = [aDecoder decodeObjectForKey:kStoreModified];
+    self.longitude = [aDecoder decodeObjectForKey:kStoreLongitude];
     self.width = [aDecoder decodeObjectForKey:kStoreWidth];
     self.positionY = [aDecoder decodeObjectForKey:kStorePositionY];
-    self.startTime = [aDecoder decodeObjectForKey:kStoreStartTime];
+    self.latitude = [aDecoder decodeObjectForKey:kStoreLatitude];
     self.storeAddress = [aDecoder decodeObjectForKey:kStoreStoreAddress];
+    self.startTime = [aDecoder decodeObjectForKey:kStoreStartTime];
+    self.racks = [aDecoder decodeObjectForKey:kStoreRacks];
     self.height = [aDecoder decodeObjectForKey:kStoreHeight];
     self.endTime = [aDecoder decodeObjectForKey:kStoreEndTime];
     self.isTestdata = [aDecoder decodeObjectForKey:kStoreIsTestdata];
@@ -180,10 +218,13 @@ NSMutableArray *tempArrayForStoreImages = [NSMutableArray array];
     [aCoder encodeObject:_storeName forKey:kStoreStoreName];
     [aCoder encodeObject:_contactNo forKey:kStoreContactNo];
     [aCoder encodeObject:_modified forKey:kStoreModified];
+    [aCoder encodeObject:_longitude forKey:kStoreLongitude];
     [aCoder encodeObject:_width forKey:kStoreWidth];
     [aCoder encodeObject:_positionY forKey:kStorePositionY];
-    [aCoder encodeObject:_startTime forKey:kStoreStartTime];
+    [aCoder encodeObject:_latitude forKey:kStoreLatitude];
     [aCoder encodeObject:_storeAddress forKey:kStoreStoreAddress];
+    [aCoder encodeObject:_startTime forKey:kStoreStartTime];
+    [aCoder encodeObject:_racks forKey:kStoreRacks];
     [aCoder encodeObject:_height forKey:kStoreHeight];
     [aCoder encodeObject:_endTime forKey:kStoreEndTime];
     [aCoder encodeObject:_isTestdata forKey:kStoreIsTestdata];

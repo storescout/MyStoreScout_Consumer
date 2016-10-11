@@ -39,7 +39,6 @@
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
          (UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert)];
     
-    [DefaultsValues setIntegerValueToUserDefaults:0 ForKey:KEY_SELECTED_MENU];
     
     
     [self setRootViewControllerForUserLoggedIn:[DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID] == 0 ? NO : YES];
@@ -55,10 +54,11 @@
 
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {
-//    NSString *token = [NSString stringWithFormat:@"%@",deviceToken];
-//    token = [token stringByReplacingOccurrencesOfString:@" " withString:@""];
-//    token = [token stringByReplacingOccurrencesOfString:@">" withString:@""];
-//    token = [token stringByReplacingOccurrencesOfString:@"<" withString:@""];
+    NSString *token = [NSString stringWithFormat:@"%@",deviceToken];
+    token = [token stringByReplacingOccurrencesOfString:@" " withString:@""];
+    token = [token stringByReplacingOccurrencesOfString:@">" withString:@""];
+    token = [token stringByReplacingOccurrencesOfString:@"<" withString:@""];
+    [DefaultsValues setStringValueToUserDefaults:token ForKey:KEY_DEVICE_TOKEN];
 }
 
 //Called when a notification is delivered to a foreground app.
@@ -90,6 +90,7 @@
 //    
 //    self.window.rootViewController = navController;
     
+    [DefaultsValues setIntegerValueToUserDefaults:0 ForKey:KEY_SELECTED_MENU];
     
     UIViewController *leftMenuVC = [[UIStoryboard storyboardWithName:[NSString stringWithFormat:@"Main"] bundle:NULL] instantiateViewControllerWithIdentifier:@"idMenuVC"];
     
@@ -103,8 +104,6 @@
         navigationController.interactivePopGestureRecognizer.enabled = NO;
     }
 
-    
-    
     _drawerController= [[MMDrawerController alloc] initWithCenterViewController:navigationController
                                                       leftDrawerViewController:leftMenuVC];
     [self.drawerController setMaximumLeftDrawerWidth: SCREEN_WIDTH * 0.75];
@@ -112,7 +111,6 @@
     [_drawerController setOpenDrawerGestureModeMask:MMOpenDrawerGestureModeNone];
     [_drawerController setCloseDrawerGestureModeMask:MMCloseDrawerGestureModeAll];
     [self.window setRootViewController:_drawerController];
-
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

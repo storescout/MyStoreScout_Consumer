@@ -56,6 +56,23 @@
     });
     [self tapGestureInitialize];
     [self integrateNextButtonToolBar];
+    
+    User *objUser = [DefaultsValues getCustomObjFromUserDefaults_ForKey:KEY_USER];
+
+    _txtUserName.text = objUser.userName;
+    _txtEmailAddress.text = objUser.email;
+    _txtMobileNumber.text = objUser.contactNo;
+    
+    if (![objUser.profilePic isEqualToString:@"default.jpg"])
+    {
+        isImageSet = YES;
+    }
+    
+    NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
+    
+    [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
+                          placeholderImage:[UIImage imageNamed:@""]];
+
 }
 
 - (void)didReceiveMemoryWarning
@@ -127,7 +144,13 @@
     else if(buttonIndex == 0)
     {
         isImageSet = NO;
-        [_imgProfilePicture setImage:DEFAULT_PROFILE_IMAGE];
+        [UIView transitionWithView:_vwImageContainer
+                          duration:0.4
+                           options:UIViewAnimationOptionTransitionFlipFromLeft
+                        animations:^{
+                            [_imgProfilePicture setImage:DEFAULT_PROFILE_IMAGE];
+                        } completion:nil];
+
     }
 }
 
@@ -142,22 +165,37 @@
         UIImage *image = [dict objectForKey:UIImagePickerControllerOriginalImage];
         UIImage *compressedImage = [[BaseVC sharedInstance] compressImage:image];
         UIImage *finalImage = [[BaseVC sharedInstance] fixOrientation:compressedImage];
-        _imgProfilePicture.image = finalImage;
+        
+        [picker dismissViewControllerAnimated:YES
+                                   completion:^{
+            [UIView transitionWithView:_vwImageContainer
+                              duration:0.4
+                               options:UIViewAnimationOptionTransitionFlipFromLeft
+                            animations:^{
+                                _imgProfilePicture.image = finalImage;
+                            } completion:nil];
+        }];
     }
     else if ([dict objectForKey:UIImagePickerControllerEditedImage])
     {
         UIImage *image = [dict objectForKey:UIImagePickerControllerEditedImage];
         UIImage *compressedImage = [[BaseVC sharedInstance] compressImage:image];
         UIImage *finalImage = [[BaseVC sharedInstance] fixOrientation:compressedImage];
-        _imgProfilePicture.image = finalImage;
+        [picker dismissViewControllerAnimated:YES
+                                   completion:^{
+           [UIView transitionWithView:_vwImageContainer
+                             duration:0.4
+                              options:UIViewAnimationOptionTransitionFlipFromLeft
+                           animations:^{
+                               _imgProfilePicture.image = finalImage;
+                           } completion:nil];
+                                   }];
     }
     
-    [picker dismissViewControllerAnimated:YES completion:nil];
-    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
-                   {
-                       strBase64 = [[BaseVC sharedInstance] encodeToBase64String:_imgProfilePicture.image];
-                   });
+    {
+        strBase64 = [[BaseVC sharedInstance] encodeToBase64String:_imgProfilePicture.image];
+    });
 }
 
 #pragma mark - Tool Bar Configuration and Events
@@ -224,9 +262,9 @@
 - (IBAction)btnEditClicked:(id)sender
 {
     [self.view endEditing:YES];
-    [UIView transitionWithView:self.view
-                      duration:0.1
-                       options:UIViewAnimationOptionTransitionCrossDissolve
+    [UIView transitionWithView:_vwChangePasswordContainer
+                      duration:0.4
+                       options:UIViewAnimationOptionTransitionFlipFromLeft
                     animations:^{
                         _vwChangePasswordContainer.hidden = !_vwChangePasswordContainer.hidden;
                         _txtUserName.enabled = !_txtUserName.enabled;
@@ -240,6 +278,73 @@
 {
     [self.view endEditing:YES];
     [self.mm_drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
+}
+
+- (IBAction)btnSaveClicked:(id)sender
+{
+    [self.view endEditing:YES];
+    
+    if ([_txtUserName.text isValid] && [_txtEmailAddress.text isValid] && [_txtMobileNumber.text isValid])
+    {
+        if ([_txtEmailAddress.text isValidEmail])
+        {
+            if ([_txtMobileNumber.text isValidPhoneNumber])
+            {
+                if (_txtOldPassword.text.length > 0 || _txtNewPassword.text.length > 0 || _txtConfirmPassword.text.length > 0)
+                {
+                    if ([_txtOldPassword.text isValid] && [_txtNewPassword.text isValid] && [_txtConfirmPassword.text isValid])
+                    {
+                        if ([_txtOldPassword.text isValidPassword] && [_txtNewPassword.text isValidPassword] && [_txtConfirmPassword.text isValidPassword])
+                        {
+                            if ([_txtNewPassword.text isEqualToString:_txtConfirmPassword.text])
+                            {
+                                
+                            }
+                            else
+                            {
+                                [AZNotification showNotificationWithTitle:@"New passwords mismatched with each other"
+                                                               controller:self
+                                                         notificationType:AZNotificationTypeError];
+                            }
+                        }
+                        else
+                        {
+                            [[BaseVC sharedInstance] addAlertBoxWithText:@"Please provide valid password.\nUse minimum 8 and maximum 16 characters with at least 1 Alphabet, 1 Number and 1 Special Character."
+                                                                    toVC:self];
+                        }
+                    }
+                    else
+                    {
+                        [AZNotification showNotificationWithTitle:@"Please fill all mandatory fields"
+                                                       controller:self
+                                                 notificationType:AZNotificationTypeError];
+                    }
+                }
+                else
+                {
+                    
+                }
+            }
+            else
+            {
+                [AZNotification showNotificationWithTitle:@"Please provide valid contact number"
+                                               controller:self
+                                         notificationType:AZNotificationTypeError];
+            }
+        }
+        else
+        {
+            [AZNotification showNotificationWithTitle:@"Please provide valid email address"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+        }
+    }
+    else
+    {
+        [AZNotification showNotificationWithTitle:@"Please fill all mandatory fields"
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
 }
 
 @end

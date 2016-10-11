@@ -9,13 +9,13 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 #import <CoreLocation/CoreLocation.h>
-#import <CoreGraphics/CoreGraphics.h>
 
-@interface NearByStoresVC : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate>
+@interface NearByStoresVC : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
 
 @property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @property (weak, nonatomic) IBOutlet UIButton *btnMenu;
+@property (weak, nonatomic) IBOutlet UITableView *tblSearchResults;
 
 @property (nonatomic, strong) CLLocationManager *locationManager;
 

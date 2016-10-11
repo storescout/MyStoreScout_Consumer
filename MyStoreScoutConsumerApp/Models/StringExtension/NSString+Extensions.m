@@ -237,9 +237,16 @@
 
 // Is Valid Phone
 
-- (BOOL)isVAlidPhoneNumber
+- (BOOL)isValidPhoneNumber
 {
     NSString *regex = @"[235689][0-9]{6}([0-9]{3})?";
+    NSPredicate *test = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    return [test evaluateWithObject:self];
+}
+
+- (BOOL)isValidPassword
+{
+    NSString *regex = @"^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,16}$";
     NSPredicate *test = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
     return [test evaluateWithObject:self];
 }

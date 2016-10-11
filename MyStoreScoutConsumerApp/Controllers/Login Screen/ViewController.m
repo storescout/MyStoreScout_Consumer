@@ -74,8 +74,6 @@
 
 - (IBAction)btnLoginClicked:(id)sender
 {
-//    [self.navigationController pushViewController:STORYBOARD_ID(@"idStoresVC") animated:YES];
-    
     [self.view endEditing:YES];
     
     if ([_txtusername.text isValid] && [_txtPassword.text isValid])
@@ -126,11 +124,10 @@
     {
         if (STATUS([[sender responseDict] valueForKey:@"status"]))
         {
-            NearByStoresVC *storeVC = STORYBOARD_ID(@"idStoresVC");
             User *objUser = [[sender responseArray] objectAtIndex:0];
             [DefaultsValues setIntegerValueToUserDefaults:objUser.userIdentifier ForKey:KEY_USER_ID];
             [DefaultsValues setCustomObjToUserDefaults:objUser ForKey:KEY_USER];
-            [self.navigationController pushViewController:storeVC animated:YES];
+            [self.navigationController pushViewController:STORYBOARD_ID(@"idStoresVC") animated:YES];
         }
         else
         {
@@ -200,6 +197,8 @@
            [[WebServiceConnector alloc]init:URL_ForgotPassword
                              withParameters:@{
                                               @"email_id":strEmail,
+                                              @"role_id":@"1",
+                                              @"is_testdata":@"1"
                                               }
                                  withObject:self
                                withSelector:@selector(DisplayMessage:)

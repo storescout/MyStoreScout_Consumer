@@ -17,6 +17,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    _lblTitle.text = _objStore.storeName;
 }
 
 - (void)didReceiveMemoryWarning

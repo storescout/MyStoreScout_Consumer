@@ -48,7 +48,7 @@
     {
         [UIView transitionWithView:_vwAddItemContainer
                           duration:0.4
-                           options:UIViewAnimationOptionTransitionFlipFromRight
+                           options:UIViewAnimationOptionTransitionFlipFromLeft
                         animations:^{
                             _vwAddItemContainer.hidden = !_vwAddItemContainer.hidden;
                         }
@@ -79,13 +79,26 @@
     return 50;
 }
 
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // Return YES - we will be able to delete all rows
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // Perform the real delete action here. Note: you may need to check editing style
+    //   if you do not perform delete only.
+    NSLog(@"Deleted row.");
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (!_vwPopUp.hidden)
     {
         [UIView transitionWithView:_vwPopUp
                           duration:0.4
-                           options:UIViewAnimationOptionTransitionCrossDissolve
+                           options:UIViewAnimationOptionTransitionFlipFromLeft
                         animations:^{
                             _vwPopUp.hidden = YES;
                         }
@@ -127,7 +140,7 @@
     {
         [UIView transitionWithView:_vwPopUp
                           duration:0.4
-                           options:UIViewAnimationOptionTransitionCrossDissolve
+                           options:UIViewAnimationOptionTransitionFlipFromLeft
                         animations:^{
                             _vwPopUp.hidden = YES;
                         }
@@ -141,7 +154,7 @@
 {
     [UIView transitionWithView:_vwPopUp
                       duration:0.4
-                       options:UIViewAnimationOptionTransitionCrossDissolve
+                       options:UIViewAnimationOptionTransitionFlipFromLeft
                     animations:^{
                         _vwPopUp.hidden = !_vwPopUp.hidden;
                     }
@@ -154,7 +167,7 @@
     {
         [UIView transitionWithView:_vwPopUp
                           duration:0.1
-                           options:UIViewAnimationOptionTransitionCrossDissolve
+                           options:UIViewAnimationOptionTransitionFlipFromLeft
                         animations:^{
                             _vwPopUp.hidden = YES;
                         }
@@ -176,7 +189,7 @@
     {
         [UIView transitionWithView:_vwPopUp
                           duration:0.4
-                           options:UIViewAnimationOptionTransitionCrossDissolve
+                           options:UIViewAnimationOptionTransitionFlipFromLeft
                         animations:^{
                             _vwPopUp.hidden = YES;
                         }
@@ -189,14 +202,12 @@
                         _vwAddItemContainer.hidden = !_vwAddItemContainer.hidden;
                         _txtAddItem.enabled = !_txtAddItem.enabled;
                     }
-                    completion:^(BOOL finished) {
-                        [_txtAddItem becomeFirstResponder];
-                    }];
+                    completion:nil];
 }
 
 - (IBAction)btnSelectClicked:(id)sender
 {
-    [self.navigationController pushViewController:STORYBOARD_ID(@"idStoreInfoVC") animated:YES];
+    //[self.navigationController pushViewController:STORYBOARD_ID(@"idStoreInfoVC") animated:YES];
 }
 
 - (IBAction)btnDeleteAllClicked:(id)sender
@@ -211,7 +222,7 @@
 {
     [UIView transitionWithView:_vwAddItemContainer
                       duration:0.4
-                       options:UIViewAnimationOptionTransitionFlipFromRight
+                       options:UIViewAnimationOptionTransitionFlipFromLeft
                     animations:^{
                         _vwAddItemContainer.hidden = !_vwAddItemContainer.hidden;
                     }

@@ -7,12 +7,15 @@
 //
 
 #import "NearByStoresVC.h"
+#import "Store.h"
+#import "StoreInfoVC.h"
 
 @interface NearByStoresVC ()
 {
-    BOOL isFirstTime;
     double latitude;
     double lontitude;
+    BOOL isFirstTime;
+    NSArray *arrStores;
     CLLocationCoordinate2D coordinates;
 }
 @end
@@ -27,11 +30,93 @@
     
     [self setLayout];
     [self configureMap];
+    [self getAllStores];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
+}
+
+#pragma mark - WS Call
+
+- (void)getAllStores
+{
+    if([[NetworkAvailability instance] isReachable])
+    {
+        long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+        
+        [[WebServiceConnector alloc]init:URL_GetAllStores
+                          withParameters:@{
+                                           @"user_id":[NSString stringWithFormat:@"%ld",user_id]
+                                           }
+                              withObject:self
+                            withSelector:@selector(DisplayResults:)
+                          forServiceType:@"JSON"
+                          showDisplayMsg:GetAllStoresMsg];
+    }
+    else
+    {
+        [AZNotification showNotificationWithTitle:NETWORK_ERR
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
+}
+
+- (void)DisplayResults:(id)sender
+{
+    [SVProgressHUD dismiss];
+    if ([sender responseCode] != 100)
+    {
+        [AZNotification showNotificationWithTitle:[sender responseError]
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
+    else
+    {
+        if (STATUS([[sender responseDict] valueForKey:@"status"]))
+        {
+            arrStores = [sender responseArray];
+            
+            [_tblSearchResults reloadData];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                //This code will run in the main thread:
+                CGRect frame = _tblSearchResults.frame;
+                frame.size.height = _tblSearchResults.contentSize.height;
+                _tblSearchResults.frame = frame;
+            });
+
+            
+            for (int i = 0; i<arrStores.count; i++)
+            {
+                Store *objStore = [arrStores objectAtIndex:i];
+                
+                MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
+                [annotation setCoordinate:CLLocationCoordinate2DMake([objStore.latitude floatValue], [objStore.longitude floatValue])];
+                [annotation setTitle:objStore.storeName];
+                [annotation setSubtitle:objStore.storeAddress];
+                [self.mapView addAnnotation:annotation];
+            }
+            
+            MKMapRect zoomRect = MKMapRectNull;
+            
+            for (id <MKAnnotation> annotation in _mapView.annotations)
+            {
+                MKMapPoint annotationPoint = MKMapPointForCoordinate(annotation.coordinate);
+                MKMapRect pointRect = MKMapRectMake(annotationPoint.x, annotationPoint.y, 0.1, 0.1);
+                zoomRect = MKMapRectUnion(zoomRect, pointRect);
+            }
+            
+            [_mapView setVisibleMapRect:zoomRect animated:YES];
+        }
+        else
+        {
+            [AZNotification showNotificationWithTitle:[[sender responseDict] valueForKey:@"message"]
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+        }
+    }
 }
 
 #pragma mark - Setting Layout
@@ -40,6 +125,9 @@
 {
     [self removeUISearchBarBackgroundInViewHierarchy:self.searchBar];
     self.searchBar.backgroundColor = [UIColor clearColor];
+    
+    _tblSearchResults.layer.cornerRadius = 10.0f;
+    _tblSearchResults.clipsToBounds = YES;
 }
 
 - (void) removeUISearchBarBackgroundInViewHierarchy:(UIView *)view
@@ -63,23 +151,87 @@
     [self.view endEditing:YES];
 }
 
+- (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize
+{
+    //UIGraphicsBeginImageContext(newSize);
+    // In next line, pass 0.0 to use the current device's pixel scaling factor (and thus account for Retina resolution).
+    // Pass 1.0 to force exact pixel size.
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
+-(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+    _tblSearchResults.hidden = searchText.length > 0 ? NO : YES;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //This code will run in the main thread:
+        CGRect frame = _tblSearchResults.frame;
+        frame.size.height = _tblSearchResults.contentSize.height;
+        _tblSearchResults.frame = frame;
+    });
+}
+
+#pragma mark - TableView Delegate Methods
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return arrStores.count;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    _tblSearchResults.hidden = YES;
+    
+    _searchBar.text = NULL;
+    
+    [_searchBar resignFirstResponder];
+
+    Store *objStore = [arrStores objectAtIndex:indexPath.row];
+    
+    _mapView.centerCoordinate = CLLocationCoordinate2DMake([objStore.latitude floatValue], [objStore.longitude floatValue]);
+    
+    for (id <MKAnnotation> annotation in _mapView.annotations)
+    {
+        
+        if ([objStore.latitude floatValue] == [annotation coordinate].latitude && [objStore.longitude floatValue] == [annotation coordinate].longitude)
+        {
+            [_mapView selectAnnotation:annotation animated:YES];
+            break;
+        }
+    }
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+
+    Store *objStore = [arrStores objectAtIndex:indexPath.row];
+
+    cell.textLabel.text = objStore.storeName;
+    
+    return cell;
+}
+
 #pragma mark - Map Configuration and Methods
 
 - (void)configureMap
 {
-    if ([CLLocationManager locationServicesEnabled])
-    {
-        if (self.locationManager == nil)
-        {
-            self.locationManager = [[CLLocationManager alloc] init];
-            self.locationManager.delegate = self;
-            self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-            self.locationManager.distanceFilter = kCLDistanceFilterNone;
-            [self.locationManager requestWhenInUseAuthorization];
-        }
-    }
-
-    [self.locationManager startUpdatingLocation];
+//    if ([CLLocationManager locationServicesEnabled])
+//    {
+//        if (self.locationManager == nil)
+//        {
+//            self.locationManager = [[CLLocationManager alloc] init];
+//            self.locationManager.delegate = self;
+//            self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+//            self.locationManager.distanceFilter = kCLDistanceFilterNone;
+//            [self.locationManager requestWhenInUseAuthorization];
+//        }
+//    }
+//
+//    [self.locationManager startUpdatingLocation];
     
     MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(coordinates, 3000, 3000);
     MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:viewRegion];
@@ -126,8 +278,60 @@
 
     if (isFirstTime)
     {
-        self.mapView.centerCoordinate = location.coordinate;//self.mapView.userLocation.location.coordinate;
-        isFirstTime = NO;
+        //self.mapView.centerCoordinate = self.mapView.userLocation.location.coordinate;
+    }
+}
+
+- (MKAnnotationView *)mapView:(MKMapView *)theMapView viewForAnnotation:(id <MKAnnotation>)annotation
+{
+    if ([annotation isKindOfClass:[MKUserLocation class]])
+    {
+        return nil;
+    }
+    
+    static NSString *SFAnnotationIdentifier = @"SFAnnotationIdentifier";
+    
+    MKPinAnnotationView *pinView = (MKPinAnnotationView *)[_mapView dequeueReusableAnnotationViewWithIdentifier:SFAnnotationIdentifier];
+    
+    if (!pinView)
+    {
+        MKAnnotationView *annotationView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:SFAnnotationIdentifier];
+        UIImage *flagImage = [UIImage imageNamed:@"BLUE_ANNOTATION"];
+        flagImage = [self imageWithImage:flagImage scaledToSize:CGSizeMake(30, 30)];
+        annotationView.image = flagImage;
+        
+        annotationView.canShowCallout = YES;
+        annotationView.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        
+        return annotationView;
+    }
+    else
+    {
+        pinView.annotation = annotation;
+    }
+    return pinView;
+}
+
+- (void)mapViewDidFinishRenderingMap:(MKMapView *)mapView fullyRendered:(BOOL)fullyRendered
+{
+    isFirstTime = NO;
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
+{
+    NSLog(@"%f %f",[view.annotation coordinate].latitude, [view.annotation coordinate].longitude);
+    for (int i = 0; i<arrStores.count; i++)
+    {
+        Store *objStore = [arrStores objectAtIndex:i];
+        
+        if ([objStore.latitude floatValue] == [view.annotation coordinate].latitude && [objStore.longitude floatValue] == [view.annotation coordinate].longitude)
+        {
+            StoreInfoVC *storeInfoVC = STORYBOARD_ID(@"idStoreInfoVC");
+            
+            storeInfoVC.objStore = objStore;
+            
+            [self.navigationController pushViewController:storeInfoVC animated:YES];
+        }
     }
 }
 

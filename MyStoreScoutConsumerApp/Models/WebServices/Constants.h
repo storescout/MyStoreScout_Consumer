@@ -19,7 +19,9 @@
 #pragma mark - Web Service Requests
 #define Server_URL    "http://54.70.249.239/MyStoreScoutWS/MobileAppService.php?Service="
 
-#define Image_Path "http://54.70.249.239/"
+#define Image_Path "http://54.70.249.239/img/"
+
+#define SERVER "http://54.70.249.239/"
 
 
 #define URL_Login [NSString stringWithFormat:@"%sLogin",Server_URL]
@@ -49,9 +51,9 @@
 #define ForgotPasswordKey @""
 #define ForgotPasswordMsg [NSString stringWithFormat:@"%@ for Password",WebserviceDialogMsg]
 
-#define RegistrationClass @""
+#define RegistrationClass @"User"
 #define RegistrationEntity @""
-#define RegistrationKey @""
+#define RegistrationKey @"data"
 #define RegistrationMsg [NSString stringWithFormat:@"%@ for Registration",WebserviceDialogMsg]
 
 #define GetAllStoresClass @"Store"

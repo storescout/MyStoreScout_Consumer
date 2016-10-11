@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 #import <CoreLocation/CoreLocation.h>
+#import "Store.h"
 
 @interface StoreInfoVC : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, UICollectionViewDataSource, UICollectionViewDelegate>
 
@@ -21,6 +22,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnEnter;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UIButton *btnDirections;
+
+@property (nonatomic, strong) CLLocationManager *locationManager;
+@property (nonatomic, strong) Store *objStore;
 
 - (IBAction)btnBackClicked:(id)sender;
 - (IBAction)btnEnterClicked:(id)sender;

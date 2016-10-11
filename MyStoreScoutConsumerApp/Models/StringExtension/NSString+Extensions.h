@@ -65,8 +65,9 @@
 + (NSString *)getStringFromData:(NSData *)data;
 
 - (BOOL)isValidEmail;
-- (BOOL)isVAlidPhoneNumber;
+- (BOOL)isValidPhoneNumber;
 - (BOOL)isValidUrl;
+- (BOOL)isValidPassword; // (Minimum 8 and Maximum 16 characters at least 1 Alphabet, 1 Number and 1 Special Character)
 
 - (NSString *)FirstLetterCapital;
 
