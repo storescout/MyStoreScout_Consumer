@@ -36,6 +36,8 @@
 
 #define URL_SaveElements [NSString stringWithFormat:@"%sSaveElements",Server_URL]
 
+#define URL_GetAllProducts [NSString stringWithFormat:@"%sGetAllProducts",Server_URL]
+
 /* ============================================================================ */
 #pragma mark - Class,Json Key and Message
 
@@ -60,6 +62,11 @@
 #define GetAllStoresEntity @""
 #define GetAllStoresKey @"data"
 #define GetAllStoresMsg [NSString stringWithFormat:@"Loading Stores"]
+
+#define GetAllProductsClass @"Products"
+#define GetAllProductsEntity @""
+#define GetAllProductsKey @"data"
+#define GetAllProductsMsg [NSString stringWithFormat:@"Loading Products"]
 
 #define AddStoreClass @"Store"
 #define AddStoreEntity @""

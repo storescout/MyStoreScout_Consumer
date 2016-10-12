@@ -24,6 +24,12 @@
     {
         _imgProfilePicture.layer.cornerRadius = _imgProfilePicture.frame.size.width / 2;
         _imgProfilePicture.clipsToBounds = YES;
+        
+        _vwImageContainer.layer.cornerRadius = _vwImageContainer.frame.size.width / 2;
+        _vwImageContainer.clipsToBounds = YES;
+        _vwImageContainer.layer.borderWidth = 2.0f;
+        _vwImageContainer.layer.borderColor = [UIColor whiteColor].CGColor;
+
     });
     
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
@@ -55,9 +61,16 @@
 
 - (void)handleTap:(UITapGestureRecognizer *)sender
 {
-    [DefaultsValues setIntegerValueToUserDefaults:-1 ForKey:KEY_SELECTED_MENU];
-    [_tblMenu reloadData];
-    [self navigateToViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"idProfileVC"]];
+    if ([DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_SELECTED_MENU] == -1)
+    {
+        [self.mm_drawerController closeDrawerAnimated:YES completion:nil];
+    }
+    else
+    {
+        [DefaultsValues setIntegerValueToUserDefaults:-1 ForKey:KEY_SELECTED_MENU];
+        [_tblMenu reloadData];
+        [self navigateToViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"idProfileVC"]];
+    }
 }
 
 #pragma mark - Custom Events
@@ -87,10 +100,20 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [DefaultsValues setIntegerValueToUserDefaults:(int)indexPath.row ForKey:KEY_SELECTED_MENU];
-    [tableView reloadData];
     
-    [self navigateToViewController:[self.storyboard instantiateViewControllerWithIdentifier:indexPath.row == 0 ? @"idStoresVC" : @"idShoppingListVC"]];
+    
+    if ([DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_SELECTED_MENU] == indexPath.row)
+    {
+        [self.mm_drawerController closeDrawerAnimated:YES completion:nil];
+    }
+    else
+    {
+        [DefaultsValues setIntegerValueToUserDefaults:(int)indexPath.row ForKey:KEY_SELECTED_MENU];
+        [tableView reloadData];
+
+        [self navigateToViewController:[self.storyboard instantiateViewControllerWithIdentifier:indexPath.row == 0 ? @"idStoresVC" : @"idShoppingListVC"]];
+    }
+    
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath

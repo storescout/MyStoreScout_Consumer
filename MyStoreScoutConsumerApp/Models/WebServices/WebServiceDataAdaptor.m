@@ -64,6 +64,13 @@
                                     forEntity:SaveElementsEntity
                                   withJSONKey:SaveElementsKey];
     }
+    else if (isService(URL_GetAllProducts))
+    {
+        arrParsedData = [self processJSONData:allValues
+                                     forClass:GetAllProductsClass
+                                    forEntity:GetAllProductsEntity
+                                  withJSONKey:GetAllProductsKey];
+    }
 
     return arrParsedData;
 }

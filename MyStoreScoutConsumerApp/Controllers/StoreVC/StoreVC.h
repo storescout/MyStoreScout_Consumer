@@ -13,6 +13,8 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *lblTitle;
 @property (weak, nonatomic) IBOutlet UIButton *btnBack;
+@property (weak, nonatomic) IBOutlet UIImageView *imgBackground;
+@property (weak, nonatomic) IBOutlet UIView *vwTopBar;
 
 @property (nonatomic, strong) Store *objStore;
 

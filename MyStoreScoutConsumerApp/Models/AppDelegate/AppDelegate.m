@@ -39,13 +39,12 @@
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
          (UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert)];
     
-    
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     
     [self setRootViewControllerForUserLoggedIn:[DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID] == 0 ? NO : YES];
     
     return YES;
 }
-
 
 - (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings
 {

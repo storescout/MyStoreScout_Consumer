@@ -24,6 +24,9 @@
 - (NSString *)encodeToBase64String:(UIImage *)image;
 - (UIImage *)decodeBase64ToImage:(NSString *)strEncodeData;
 - (NSInteger)getRowsforTable:(UITableView *)tableView forArray:(NSMutableArray *)array withPlaceHolder: (NSString *)strPlaceHolder;
+- (NSInteger)getRowsforCollection:(UICollectionView *)collectionView
+                         forArray:(NSMutableArray *)array
+                  withPlaceHolder: (NSString *)strPlaceHolder;
 - (void)addRefreshControl:(UIRefreshControl *)refreshControl toTable:(UITableView *)tableView withViewController:(UIViewController *)VC forSelector:(SEL)handlingMethod;
 - (BOOL)image:(UIImage *)image1 isEqualTo:(UIImage *)image2;
 

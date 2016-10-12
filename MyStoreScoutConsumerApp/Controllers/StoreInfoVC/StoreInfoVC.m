@@ -31,6 +31,29 @@
     _lblAddress.text = _objStore.storeAddress;
     _lblContactNumber.text = _objStore.contactNo;
     _lblTimings.text = [NSString stringWithFormat:@"%@ - %@", _objStore.startTime, _objStore.endTime];
+    
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                                 action:@selector(contactNumberTapped:)];
+    tapGesture.numberOfTapsRequired = 1;
+    [_lblContactNumber addGestureRecognizer:tapGesture];
+}
+
+- (void)contactNumberTapped:(UITapGestureRecognizer *)sender
+{
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"telprompt://%@", _lblContactNumber.text]];
+    [[UIApplication  sharedApplication] openURL:url];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self.locationManager startUpdatingLocation];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [self.locationManager stopUpdatingLocation];
 }
 
 - (void)didReceiveMemoryWarning
@@ -123,7 +146,9 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return _objStore.storeImages.count;
+    return [[BaseVC sharedInstance] getRowsforCollection:collectionView
+                                                forArray:(NSMutableArray *)_objStore.storeImages
+                                         withPlaceHolder:@"No Pictures Available"];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath

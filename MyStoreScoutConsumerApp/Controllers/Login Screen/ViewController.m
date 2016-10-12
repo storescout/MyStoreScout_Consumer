@@ -235,6 +235,8 @@
 
 - (IBAction)btnSignUpClicked:(id)sender
 {
+    [self.view endEditing:YES];
+
     [self.navigationController pushViewController:STORYBOARD_ID(@"idRegisterVC") animated:YES];
 }
 

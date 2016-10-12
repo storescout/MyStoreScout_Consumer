@@ -254,6 +254,23 @@
     return [array count];
 }
 
+- (NSInteger)getRowsforCollection:(UICollectionView *)collectionView
+                         forArray:(NSMutableArray *)array
+                  withPlaceHolder: (NSString *)strPlaceHolder
+{
+    if (array.count > 0)
+        collectionView.backgroundView = nil;
+    else
+    {
+        UILabel *noDataMessage = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, collectionView.bounds.size.width, collectionView.bounds.size.height)];
+        noDataMessage.text = strPlaceHolder;
+        noDataMessage.textColor = [UIColor darkGrayColor];
+        noDataMessage.textAlignment = NSTextAlignmentCenter;
+        collectionView.backgroundView = noDataMessage;
+    }
+    return [array count];
+}
+
 - (void)addRefreshControl:(UIRefreshControl *)refreshControl
                   toTable:(UITableView *)tableView
        withViewController:(UIViewController *)VC

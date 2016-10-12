@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E3763578CC5390350D7CFFC9 /* libPods-MyStoreScoutConsumerApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DEEA58F3C27D9F1F99D0BE9 /* libPods-MyStoreScoutConsumerApp.a */; };
+		E40DB83C1DAE67A6000DDA22 /* Products.m in Sources */ = {isa = PBXBuildFile; fileRef = E40DB83B1DAE67A6000DDA22 /* Products.m */; };
 		E458913D1DACBEDA001F55CF /* Racks.m in Sources */ = {isa = PBXBuildFile; fileRef = E458913C1DACBEDA001F55CF /* Racks.m */; };
 		E45891401DACE6AB001F55CF /* StoreImagesCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E458913F1DACE6AB001F55CF /* StoreImagesCell.m */; };
 		E45E1C4D1DA8BBAF0051C610 /* MenuVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E45E1C4C1DA8BBAF0051C610 /* MenuVC.m */; };
@@ -84,6 +85,8 @@
 		3DC059275D65588637FEA1FF /* Pods-MyStoreScoutConsumerApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyStoreScoutConsumerApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MyStoreScoutConsumerApp/Pods-MyStoreScoutConsumerApp.debug.xcconfig"; sourceTree = "<group>"; };
 		5074D9F999ECAB45118F87E1 /* Pods-MyStoreScoutConsumerApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyStoreScoutConsumerApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-MyStoreScoutConsumerApp/Pods-MyStoreScoutConsumerApp.release.xcconfig"; sourceTree = "<group>"; };
 		6DEEA58F3C27D9F1F99D0BE9 /* libPods-MyStoreScoutConsumerApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MyStoreScoutConsumerApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E40DB83A1DAE67A6000DDA22 /* Products.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Products.h; sourceTree = "<group>"; };
+		E40DB83B1DAE67A6000DDA22 /* Products.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Products.m; sourceTree = "<group>"; };
 		E458913B1DACBEDA001F55CF /* Racks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Racks.h; sourceTree = "<group>"; };
 		E458913C1DACBEDA001F55CF /* Racks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Racks.m; sourceTree = "<group>"; };
 		E458913E1DACE6AB001F55CF /* StoreImagesCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StoreImagesCell.h; sourceTree = "<group>"; };
@@ -481,6 +484,8 @@
 		E4D016FB1DA3BC870007524D /* Object Files */ = {
 			isa = PBXGroup;
 			children = (
+				E40DB83A1DAE67A6000DDA22 /* Products.h */,
+				E40DB83B1DAE67A6000DDA22 /* Products.m */,
 				E458913B1DACBEDA001F55CF /* Racks.h */,
 				E458913C1DACBEDA001F55CF /* Racks.m */,
 				E4D016FC1DA3BC870007524D /* Store.h */,
@@ -797,6 +802,7 @@
 				E4D017521DA3BC870007524D /* AZNotificationView.m in Sources */,
 				E4D017711DA3BC870007524D /* UIImage+WebP.m in Sources */,
 				E4D0176D1DA3BC870007524D /* SDWebImagePrefetcher.m in Sources */,
+				E40DB83C1DAE67A6000DDA22 /* Products.m in Sources */,
 				E4D017621DA3BC870007524D /* NSUserDefaults+SaveCustomObject.m in Sources */,
 				E4D0175B1DA3BC870007524D /* NetworkAvailability.m in Sources */,
 				E4D016D51DA3BBDF0007524D /* AppDelegate.m in Sources */,

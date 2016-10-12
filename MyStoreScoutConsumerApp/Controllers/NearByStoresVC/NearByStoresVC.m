@@ -33,6 +33,18 @@
     [self getAllStores];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self.locationManager startUpdatingLocation];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [self.locationManager stopUpdatingLocation];
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -219,19 +231,20 @@
 
 - (void)configureMap
 {
-//    if ([CLLocationManager locationServicesEnabled])
-//    {
-//        if (self.locationManager == nil)
-//        {
-//            self.locationManager = [[CLLocationManager alloc] init];
-//            self.locationManager.delegate = self;
-//            self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-//            self.locationManager.distanceFilter = kCLDistanceFilterNone;
-//            [self.locationManager requestWhenInUseAuthorization];
-//        }
-//    }
-//
-//    [self.locationManager startUpdatingLocation];
+    if ([CLLocationManager locationServicesEnabled])
+    {
+        if (self.locationManager == nil)
+        {
+            self.locationManager = [[CLLocationManager alloc] init];
+            self.locationManager.delegate = self;
+            self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+            self.locationManager.distanceFilter = kCLDistanceFilterNone;
+            [self.locationManager requestWhenInUseAuthorization];
+            [self.locationManager requestAlwaysAuthorization];
+        }
+    }
+
+    [self.locationManager startUpdatingLocation];
     
     MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(coordinates, 3000, 3000);
     MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:viewRegion];
@@ -278,7 +291,7 @@
 
     if (isFirstTime)
     {
-        //self.mapView.centerCoordinate = self.mapView.userLocation.location.coordinate;
+        self.mapView.centerCoordinate = annotation.coordinate;//self.mapView.userLocation.location.coordinate;
     }
 }
 
