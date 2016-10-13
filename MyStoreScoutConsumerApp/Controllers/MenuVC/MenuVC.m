@@ -49,7 +49,8 @@
     NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
     
     [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
-                          placeholderImage:[UIImage imageNamed:@""]];
+                          placeholderImage:[UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]
+                                   options:SDWebImageRefreshCached];
 }
 
 - (void)didReceiveMemoryWarning

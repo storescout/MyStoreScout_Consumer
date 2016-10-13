@@ -13,6 +13,7 @@
     BOOL isImageSet;
     UIImagePickerController *imagePickerController;
     NSString *strBase64;
+    UIImage *tempImage;
 }
 @end
 
@@ -23,6 +24,8 @@
     [super viewDidLoad];
     
     strBase64 = @"";
+    
+    tempImage = [UIImage imageNamed:@"IMG_DEFAULT_PROFILE"];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.00001 * NSEC_PER_SEC), dispatch_get_main_queue(),^
     {
@@ -71,7 +74,7 @@
     NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
     
     [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
-                          placeholderImage:[UIImage imageNamed:@""]];
+                          placeholderImage:[UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]];
 
 }
 
@@ -97,15 +100,18 @@
 
 - (void)tapGesture:(id)sender
 {
-    BOOL isDefaultImage = isImageSet ? NO : YES;
-    
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Select your option"
-                                                             delegate:self
-                                                    cancelButtonTitle:@"Cancel"
-                                               destructiveButtonTitle:isDefaultImage ? nil : @"Remove Photo"
-                                                    otherButtonTitles:@"Take Photo", @"Choose from Gallery", nil];
-    actionSheet.tag = isDefaultImage ?  0 : 1;
-    [actionSheet showInView:self.view];
+    if(!_vwChangePasswordContainer.hidden)
+    {
+        BOOL isDefaultImage = isImageSet ? NO : YES;
+        
+        UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Select your option"
+                                                                 delegate:self
+                                                        cancelButtonTitle:@"Cancel"
+                                                   destructiveButtonTitle:isDefaultImage ? nil : @"Remove Photo"
+                                                        otherButtonTitles:@"Take Photo", @"Choose from Gallery", nil];
+        actionSheet.tag = isDefaultImage ?  0 : 1;
+        [actionSheet showInView:self.view];
+    }
 }
 
 -(void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
@@ -151,6 +157,7 @@
     else if(buttonIndex == 0)
     {
         isImageSet = NO;
+        strBase64 = @"";
         [UIView transitionWithView:_vwImageContainer
                           duration:0.4
                            options:UIViewAnimationOptionTransitionFlipFromLeft
@@ -173,6 +180,8 @@
         UIImage *compressedImage = [[BaseVC sharedInstance] compressImage:image];
         UIImage *finalImage = [[BaseVC sharedInstance] fixOrientation:compressedImage];
         
+        tempImage = finalImage;
+        
         [picker dismissViewControllerAnimated:YES
                                    completion:^{
             [UIView transitionWithView:_vwImageContainer
@@ -182,12 +191,20 @@
                                 _imgProfilePicture.image = finalImage;
                             } completion:nil];
         }];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
+                       {
+                           strBase64 = [[BaseVC sharedInstance] encodeToBase64String:finalImage];
+                       });
+
     }
     else if ([dict objectForKey:UIImagePickerControllerEditedImage])
     {
         UIImage *image = [dict objectForKey:UIImagePickerControllerEditedImage];
         UIImage *compressedImage = [[BaseVC sharedInstance] compressImage:image];
         UIImage *finalImage = [[BaseVC sharedInstance] fixOrientation:compressedImage];
+        
+        tempImage = finalImage;
+
         [picker dismissViewControllerAnimated:YES
                                    completion:^{
            [UIView transitionWithView:_vwImageContainer
@@ -195,14 +212,15 @@
                               options:UIViewAnimationOptionTransitionFlipFromLeft
                            animations:^{
                                _imgProfilePicture.image = finalImage;
-                           } completion:nil];
+                           }
+                           completion:nil];
                                    }];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
+                       {
+                           strBase64 = [[BaseVC sharedInstance] encodeToBase64String:finalImage];
+                       });
+
     }
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
-    {
-        strBase64 = [[BaseVC sharedInstance] encodeToBase64String:_imgProfilePicture.image];
-    });
 }
 
 - (void)navigationController:(UINavigationController *)navigationController
@@ -312,7 +330,33 @@
                         {
                             if ([_txtNewPassword.text isEqualToString:_txtConfirmPassword.text])
                             {
-                                
+                                // TODO: Calling WS
+                                if([[NetworkAvailability instance] isReachable])
+                                {
+                                    long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+
+                                    [[WebServiceConnector alloc]init:URL_EditProfile
+                                                      withParameters:@{
+                                                                       @"user_id":[NSString stringWithFormat:@"%ld", user_id],
+                                                                       @"role_id":@"1",
+                                                                       @"profile_pic":strBase64,
+                                                                       @"username":_txtUserName.text,
+                                                                       @"email":_txtEmailAddress.text,
+                                                                       @"mobile_no":_txtMobileNumber.text,
+                                                                       @"old_password":_txtOldPassword.text,
+                                                                       @"new_password":_txtNewPassword.text
+                                                                       }
+                                                          withObject:self
+                                                        withSelector:@selector(DisplayResults:)
+                                                      forServiceType:@"JSON"
+                                                      showDisplayMsg:EditProfileMsg];
+                                }
+                                else
+                                {
+                                    [AZNotification showNotificationWithTitle:NETWORK_ERR
+                                                                   controller:self
+                                                             notificationType:AZNotificationTypeError];
+                                }
                             }
                             else
                             {
@@ -336,7 +380,33 @@
                 }
                 else
                 {
-                    
+                    if([[NetworkAvailability instance] isReachable])
+                    {
+
+                        long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+
+                        [[WebServiceConnector alloc]init:URL_EditProfile
+                                          withParameters:@{
+                                                           @"user_id":[NSString stringWithFormat:@"%ld", user_id],
+                                                           @"role_id":@"1",
+                                                           @"profile_pic":strBase64,
+                                                           @"username":_txtUserName.text,
+                                                           @"email":_txtEmailAddress.text,
+                                                           @"mobile_no":_txtMobileNumber.text,
+                                                           @"old_password":_txtOldPassword.text,
+                                                           @"new_password":_txtNewPassword.text
+                                                           }
+                                              withObject:self
+                                            withSelector:@selector(DisplayResults:)
+                                          forServiceType:@"JSON"
+                                          showDisplayMsg:EditProfileMsg];
+                    }
+                    else
+                    {
+                        [AZNotification showNotificationWithTitle:NETWORK_ERR
+                                                       controller:self
+                                                 notificationType:AZNotificationTypeError];
+                    }
                 }
             }
             else
@@ -358,6 +428,60 @@
         [AZNotification showNotificationWithTitle:@"Please fill all mandatory fields"
                                        controller:self
                                  notificationType:AZNotificationTypeError];
+    }
+}
+
+- (void)DisplayResults:(id)sender
+{
+    [SVProgressHUD dismiss];
+    
+    if ([sender responseCode] != 100)
+    {
+        [AZNotification showNotificationWithTitle:[sender responseError]
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
+    else
+    {
+        if (STATUS([[sender responseDict] valueForKey:@"status"]))
+        {
+            User *objUser = [[sender responseArray] objectAtIndex:0];
+            [DefaultsValues setCustomObjToUserDefaults:objUser ForKey:KEY_USER];
+            
+            _txtUserName.text = objUser.userName;
+            _txtEmailAddress.text = objUser.email;
+            _txtMobileNumber.text = objUser.contactNo;
+            
+            if (![objUser.profilePic isEqualToString:@"default.jpg"])
+            {
+                isImageSet = YES;
+            }
+            
+            [SDWebImageManager.sharedManager.imageCache clearMemory];
+            [SDWebImageManager.sharedManager.imageCache clearDisk];
+            
+            NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
+            
+            UIImageView *imgView;
+
+            [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
+                                  placeholderImage:tempImage
+                                           options:SDWebImageRefreshCached];
+            
+//            [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
+//                                  placeholderImage:[UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]];
+
+            
+            [AZNotification showNotificationWithTitle:@"Changes has been saved successfully"
+                                           controller:self
+                                     notificationType:AZNotificationTypeSuccess];
+        }
+        else
+        {
+            [AZNotification showNotificationWithTitle:[[sender responseDict] valueForKey:@"message"]
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+        }
     }
 }
 

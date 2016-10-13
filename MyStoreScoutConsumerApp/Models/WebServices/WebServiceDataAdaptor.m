@@ -71,6 +71,13 @@
                                     forEntity:GetAllProductsEntity
                                   withJSONKey:GetAllProductsKey];
     }
+    else if (isService(URL_EditProfile))
+    {
+        arrParsedData = [self processJSONData:allValues
+                                     forClass:EditProfileClass
+                                    forEntity:EditProfileEntity
+                                  withJSONKey:EditProfileKey];
+    }
 
     return arrParsedData;
 }

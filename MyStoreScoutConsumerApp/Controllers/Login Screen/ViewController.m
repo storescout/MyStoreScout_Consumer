@@ -140,6 +140,8 @@
 
 - (IBAction)btnForgotPasswordClicked:(id)sender
 {
+    [self.view endEditing:YES];
+    
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:APP_NAME
                                                                              message:@"Please enter your email address to reset your password"
                                                                       preferredStyle:UIAlertControllerStyleAlert];

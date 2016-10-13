@@ -23,6 +23,7 @@
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UIButton *btnDirections;
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *heightOfAddress;
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, strong) Store *objStore;
 

@@ -36,6 +36,18 @@
                                                                                  action:@selector(contactNumberTapped:)];
     tapGesture.numberOfTapsRequired = 1;
     [_lblContactNumber addGestureRecognizer:tapGesture];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.00001 * NSEC_PER_SEC), dispatch_get_main_queue(), ^
+    {
+        _heightOfAddress.constant = [self lineCountForLabel:_lblAddress] == 1 ? 24 : 34;
+        [self.view layoutIfNeeded];
+    });
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
 }
 
 - (void)contactNumberTapped:(UITapGestureRecognizer *)sender
@@ -59,6 +71,19 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
+}
+
+- (int)lineCountForLabel:(UILabel *)label
+{
+    
+    CGRect sizeOfText = [label.text boundingRectWithSize:label.frame.size
+                                                   options:NSStringDrawingUsesLineFragmentOrigin
+                                                attributes:@{NSFontAttributeName: label.font}
+                                                   context:nil];
+//    CGSize sizeOfText = [label.text sizeWithFont:label.font
+//                               constrainedToSize:label.frame.size
+//                                   lineBreakMode:UILineBreakModeWordWrap];
+    return sizeOfText.size.height / label.font.pointSize;
 }
 
 - (void)configureMap
@@ -146,6 +171,7 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
+    NSLog(@"%lu",(unsigned long)_objStore.storeImages.count);
     return [[BaseVC sharedInstance] getRowsforCollection:collectionView
                                                 forArray:(NSMutableArray *)_objStore.storeImages
                                          withPlaceHolder:@"No Pictures Available"];
@@ -168,6 +194,11 @@
     return cell;
 }
 
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    return CGSizeMake((collectionView.frame.size.width/3) - 10, (collectionView.frame.size.width/3) - 10);
+}
+
 #pragma mark - Button Click Events
 
 - (IBAction)btnBackClicked:(id)sender
@@ -184,12 +215,7 @@
 
 - (IBAction)btnDirectionsClicked:(id)sender
 {
-//    NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"http://maps.google.com/maps?saddr=%f,%f&daddr=%f,%f",latitude,lontitude,view.annotation.coordinate.latitude,view.annotation.coordinate.longitude]];
-
-//    NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"http://maps.google.com/maps?saddr=21.1702,72.8311&daddr=23.0225,72.5714"]];
-//    [[UIApplication sharedApplication] openURL:URL];
-    
-    NSString *url = [NSString stringWithFormat:@"http://maps.apple.com/?saddr=%f,%f&daddr=%f,%f", latitude, lontitude,[_objStore.latitude floatValue],[_objStore.longitude floatValue]];
+    NSString *url = [NSString stringWithFormat:@"http://maps.apple.com/?saddr=%f,%f&daddr=%f,%f", latitude, lontitude, [_objStore.latitude floatValue], [_objStore.longitude floatValue]];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
     
 }

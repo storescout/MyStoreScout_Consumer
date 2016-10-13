@@ -38,6 +38,8 @@
 
 #define URL_GetAllProducts [NSString stringWithFormat:@"%sGetAllProducts",Server_URL]
 
+#define URL_EditProfile [NSString stringWithFormat:@"%sEditProfile",Server_URL]
+
 /* ============================================================================ */
 #pragma mark - Class,Json Key and Message
 
@@ -72,6 +74,11 @@
 #define AddStoreEntity @""
 #define AddStoreKey @"data"
 #define AddStoreMsg [NSString stringWithFormat:@"Generating Store"]
+
+#define EditProfileClass @"User"
+#define EditProfileEntity @""
+#define EditProfileKey @"data"
+#define EditProfileMsg [NSString stringWithFormat:@"Updating Profile"]
 
 #define SaveElementsClass @""
 #define SaveElementsEntity @""
