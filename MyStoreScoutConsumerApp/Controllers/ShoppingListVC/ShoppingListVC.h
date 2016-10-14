@@ -11,7 +11,7 @@
 @interface ShoppingListVC : UIViewController <UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate, UITextFieldDelegate, UIGestureRecognizerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *vwPopUp;
-@property (weak, nonatomic) IBOutlet UITableView *tblShoppingList;
+@property (strong, nonatomic) IBOutlet UITableView *tblShoppingList;
 @property (weak, nonatomic) IBOutlet UIButton *btnBack;
 @property (weak, nonatomic) IBOutlet UIButton *btnAddItem;
 @property (weak, nonatomic) IBOutlet UIButton *btnSelect;
@@ -19,8 +19,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnSave;
 @property (weak, nonatomic) IBOutlet UIButton *btnCancel;
 @property (weak, nonatomic) IBOutlet UITextField *txtAddItem;
-@property (weak, nonatomic) IBOutlet UIView *vwAddItem;
-@property (weak, nonatomic) IBOutlet UIView *vwAddItemContainer;
+@property (strong, nonatomic) IBOutlet UIView *vwAddItem;
+@property (strong, nonatomic) IBOutlet UIView *vwAddItemContainer;
+@property (strong, nonatomic) IBOutlet UITableView *tblResults;
 
 - (IBAction)btnOptionsClicked:(id)sender;
 - (IBAction)btnBackClicked:(id)sender;

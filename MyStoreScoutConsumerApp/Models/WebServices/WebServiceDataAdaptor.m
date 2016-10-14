@@ -78,6 +78,27 @@
                                     forEntity:EditProfileEntity
                                   withJSONKey:EditProfileKey];
     }
+    else if (isService(URL_GetSearchResultsForText))
+    {
+        arrParsedData = [self processJSONData:allValues
+                                     forClass:SearchProductsClass
+                                    forEntity:SearchProductsEntity
+                                  withJSONKey:SearchProductsKey];
+    }
+    else if (isService(URL_GetShoppingList))
+    {
+        arrParsedData = [self processJSONData:allValues
+                                     forClass:GetShoppingListClass
+                                    forEntity:GetShoppingListEntity
+                                  withJSONKey:GetShoppingListKey];
+    }
+    else if (isService(URL_AddProductInShoppingList))
+    {
+        arrParsedData = [self processJSONData:allValues
+                                     forClass:AddProductInShoppingListClass
+                                    forEntity:AddProductInShoppingListEntity
+                                  withJSONKey:AddProductInShoppingListKey];
+    }
 
     return arrParsedData;
 }

@@ -54,7 +54,7 @@
         [object performSelectorOnMainThread:selector withObject:self waitUntilDone:false];
         return;
     }
-    [SVProgressHUD showWithStatus:message maskType:SVProgressHUDMaskTypeBlack];
+    //[SVProgressHUD showWithStatus:message maskType:SVProgressHUDMaskTypeBlack];
 
     
     [server initWithWebRequests:URLRequest inBlock:^(NSError *error, id objects, NSString *responseString)

@@ -75,7 +75,6 @@
     
     [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
                           placeholderImage:[UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]];
-
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -144,15 +143,15 @@
         [SVProgressHUD showWithStatus:@"Please wait"];
         
         dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void)
-                       {
-                           imagePickerController = [[UIImagePickerController alloc] init];
-                           imagePickerController.delegate = self;
-                           imagePickerController.sourceType =  UIImagePickerControllerSourceTypePhotoLibrary;
-                           [self presentViewController:imagePickerController animated:YES completion:^
-                            {
-                                [SVProgressHUD dismiss];
-                            }];
-                       });
+        {
+            imagePickerController = [[UIImagePickerController alloc] init];
+            imagePickerController.delegate = self;
+            imagePickerController.sourceType =  UIImagePickerControllerSourceTypePhotoLibrary;
+            [self presentViewController:imagePickerController animated:YES completion:^
+            {
+                [SVProgressHUD dismiss];
+            }];
+        });
     }
     else if(buttonIndex == 0)
     {
@@ -192,9 +191,9 @@
                             } completion:nil];
         }];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
-                       {
-                           strBase64 = [[BaseVC sharedInstance] encodeToBase64String:finalImage];
-                       });
+        {
+            strBase64 = [[BaseVC sharedInstance] encodeToBase64String:finalImage];
+        });
 
     }
     else if ([dict objectForKey:UIImagePickerControllerEditedImage])
@@ -461,16 +460,10 @@
             [SDWebImageManager.sharedManager.imageCache clearDisk];
             
             NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
-            
-            UIImageView *imgView;
 
             [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
                                   placeholderImage:tempImage
                                            options:SDWebImageRefreshCached];
-            
-//            [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
-//                                  placeholderImage:[UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]];
-
             
             [AZNotification showNotificationWithTitle:@"Changes has been saved successfully"
                                            controller:self

@@ -38,7 +38,14 @@
 
 #define URL_GetAllProducts [NSString stringWithFormat:@"%sGetAllProducts",Server_URL]
 
+#define URL_GetSearchResultsForText [NSString stringWithFormat:@"%sGetSearchResultsForText",Server_URL]
+
 #define URL_EditProfile [NSString stringWithFormat:@"%sEditProfile",Server_URL]
+
+#define URL_GetShoppingList [NSString stringWithFormat:@"%sGetShoppingList",Server_URL]
+
+#define URL_AddProductInShoppingList [NSString stringWithFormat:@"%sAddProductInShoppingList",Server_URL]
+
 
 /* ============================================================================ */
 #pragma mark - Class,Json Key and Message
@@ -69,6 +76,21 @@
 #define GetAllProductsEntity @""
 #define GetAllProductsKey @"data"
 #define GetAllProductsMsg [NSString stringWithFormat:@"Loading Products"]
+
+#define GetShoppingListClass @"ShoppingList"
+#define GetShoppingListEntity @""
+#define GetShoppingListKey @"data"
+#define GetShoppingListMsg [NSString stringWithFormat:@"Loading Shopping List"]
+
+#define SearchProductsClass @"Products"
+#define SearchProductsEntity @""
+#define SearchProductsKey @"data"
+#define SearchProductsMsg [NSString stringWithFormat:@"Loading Products"]
+
+#define AddProductInShoppingListClass @"ShoppingList"
+#define AddProductInShoppingListEntity @""
+#define AddProductInShoppingListKey @"data"
+#define AddProductInShoppingListMsg [NSString stringWithFormat:@"Loading Products"]
 
 #define AddStoreClass @"Store"
 #define AddStoreEntity @""

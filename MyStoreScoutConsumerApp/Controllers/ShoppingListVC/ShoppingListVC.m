@@ -9,11 +9,15 @@
 #import "ShoppingListVC.h"
 #import "ShoppingListCell.h"
 #import "Products.h"
+#import "ShoppingList.h"
 
 @interface ShoppingListVC ()
 {
     NSInteger isSelectAll;
-    NSArray *arrProducts;
+    NSArray *arrShoppingList;
+    NSMutableArray *arrResults;
+    UIRefreshControl *refreshControl;
+    NSInteger productID;
 }
 @end
 
@@ -24,6 +28,7 @@
     [super viewDidLoad];
     
     isSelectAll = 0;
+    productID = 0;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.00001 * NSEC_PER_SEC), dispatch_get_main_queue(),^
     {
@@ -36,11 +41,22 @@
                                                  withPlaceHolder:@"Add item name"];
     });
     
-    [self getAllProducts];
+    [self getAllShoppingListItems];
+    
+    // Intializing refresh control for Pull-To-Refresh
+    refreshControl = [[UIRefreshControl alloc] init];
+    [[BaseVC sharedInstance] addRefreshControl:refreshControl
+                                       toTable:_tblShoppingList
+                            withViewController:self
+                                   forSelector:@selector(getAllShoppingListItems)];
     
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     tapGesture.delegate = self;
     [_vwAddItemContainer addGestureRecognizer:tapGesture];
+    
+    [_txtAddItem addTarget:self
+                    action:@selector(textFieldDidChange:)
+          forControlEvents:UIControlEventEditingChanged];
 }
 
 - (void)didReceiveMemoryWarning
@@ -50,13 +66,13 @@
 
 #pragma mark - WS Call
 
-- (void)getAllProducts
+- (void)getAllShoppingListItems
 {
     if([[NetworkAvailability instance] isReachable])
     {
         long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
         
-        [[WebServiceConnector alloc]init:URL_GetAllProducts
+        [[WebServiceConnector alloc]init:URL_GetShoppingList
                           withParameters:@{
                                            @"user_id":[NSString stringWithFormat:@"%ld",user_id],
                                            @"role_id":@"1"
@@ -68,6 +84,7 @@
     }
     else
     {
+        [refreshControl endRefreshing];
         [AZNotification showNotificationWithTitle:NETWORK_ERR
                                        controller:self
                                  notificationType:AZNotificationTypeError];
@@ -77,6 +94,8 @@
 - (void)DisplayResults:(id)sender
 {
     [SVProgressHUD dismiss];
+    [refreshControl endRefreshing];
+
     if ([sender responseCode] != 100)
     {
         [AZNotification showNotificationWithTitle:[sender responseError]
@@ -87,10 +106,9 @@
     {
         if (STATUS([[sender responseDict] valueForKey:@"status"]))
         {
-            arrProducts = [sender responseArray];
+            arrShoppingList = [sender responseArray];
             
             [_tblShoppingList reloadData];
-
         }
     }
 }
@@ -114,6 +132,16 @@
     }
 }
 
+- (BOOL) gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    if (!_tblResults.hidden)
+    {
+        if (CGRectContainsPoint(_tblResults.bounds, [touch locationInView:_tblResults]))
+            return NO;
+    }
+    return YES;
+}
+
 #pragma mark - UITextField Delegate Methods
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
@@ -122,71 +150,160 @@
     return YES;
 }
 
+- (void)textFieldDidChange:(UITextField *)sender
+{
+    productID = 0;
+    
+    _tblResults.hidden = sender.text.length > 0 ? NO : YES;
+    
+    if(sender.text.length > 0)
+    {
+        if([[NetworkAvailability instance] isReachable])
+        {
+            long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+            
+            [[WebServiceConnector alloc]init:URL_GetSearchResultsForText
+                              withParameters:@{
+                                               @"user_id":[NSString stringWithFormat:@"%ld",user_id],
+                                               @"role_id":@"1",
+                                               @"search_text":sender.text
+                                               }
+                                  withObject:self
+                                withSelector:@selector(DisplaySearchResults:)
+                              forServiceType:@"JSON"
+                              showDisplayMsg:SearchProductsMsg];
+        }
+        else
+        {
+            [AZNotification showNotificationWithTitle:NETWORK_ERR
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+        }
+    }
+    else
+    {
+        [arrResults removeAllObjects];
+        [_tblResults reloadData];
+    }
+}
+
+- (void)DisplaySearchResults:(id)sender
+{
+    [SVProgressHUD dismiss];
+    if ([sender responseCode] != 100)
+    {
+        [AZNotification showNotificationWithTitle:[sender responseError]
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
+    else
+    {
+        if (STATUS([[sender responseDict] valueForKey:@"status"]))
+        {
+            [arrResults removeAllObjects];
+            arrResults = (NSMutableArray *)[sender responseArray];
+            [_tblResults reloadData];
+        }
+    }
+}
+
 #pragma mark - UITableView Delegate Methods
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 44;
+    if (tableView == _tblShoppingList)
+    {
+        return 44;
+    }
+    return 35;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return arrProducts.count;
+    return tableView == _tblShoppingList ? arrShoppingList.count : [[BaseVC sharedInstance] getRowsforTable:tableView
+                                                                                                   forArray:arrResults
+                                                                                            withPlaceHolder:@"No Result Found"];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Return YES - we will be able to delete all rows
-    return YES;
+    return tableView == _tblShoppingList ? YES : NO;
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Perform the real delete action here. Note: you may need to check editing style
-    //   if you do not perform delete only.
-    NSLog(@"Deleted row.");
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (!_vwPopUp.hidden)
+    if (tableView == _tblShoppingList)
     {
-        [UIView transitionWithView:_vwPopUp
-                          duration:0.4
-                           options:UIViewAnimationOptionTransitionFlipFromLeft
-                        animations:^{
-                            _vwPopUp.hidden = YES;
-                        }
-                        completion:NULL];
+        if (!_vwPopUp.hidden)
+        {
+            [UIView transitionWithView:_vwPopUp
+                              duration:0.4
+                               options:UIViewAnimationOptionTransitionFlipFromLeft
+                            animations:^{
+                                _vwPopUp.hidden = YES;
+                            }
+                            completion:NULL];
+        }
+    }
+    else
+    {
+        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        
+        Products *objProduct = [arrResults objectAtIndex:indexPath.row];
+        productID = [objProduct.productsIdentifier integerValue];
+        _txtAddItem.text = cell.textLabel.text;
+        
+        [arrResults removeAllObjects];
+        [_tblResults reloadData];
+        [_tblResults setHidden:YES];
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    ShoppingListCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    
-    Products *objProduct = [arrProducts objectAtIndex:indexPath.row];
-    
-    cell.lblItemName.text = objProduct.productName;
-    
-    cell.contentView.backgroundColor = indexPath.row % 2 == 0 ? [UIColor whiteColor] : rgb(242, 242, 242, 1.0);
-    
-    if (isSelectAll == 0)
+    if (tableView == _tblShoppingList)
     {
-        [cell.btnIsChecked setImage:[UIImage imageNamed:indexPath.row % 2 == 0 ? @"IMG_UNCHECKED" : @"IMG_CHECKED"] forState:UIControlStateNormal];
+        ShoppingListCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+        
+        ShoppingList *objShoppingList = [arrShoppingList objectAtIndex:indexPath.row];
+        
+        Products *objProduct = [objShoppingList.productdetail objectAtIndex:0];
+        
+        cell.lblItemName.text = objProduct.productName;
+        
+        cell.contentView.backgroundColor = indexPath.row % 2 == 0 ? [UIColor whiteColor] : rgb(242, 242, 242, 1.0);
+        
+        if (isSelectAll == 0)
+        {
+            [cell.btnIsChecked setImage:[UIImage imageNamed:[objShoppingList.isBought boolValue] ? @"IMG_CHECKED" : @"IMG_UNCHECKED"] forState:UIControlStateNormal];
+        }
+        else
+        {
+            [cell.btnIsChecked setImage:[UIImage imageNamed:isSelectAll == 2 ? @"IMG_UNCHECKED" : @"IMG_CHECKED"] forState:UIControlStateNormal];
+        }
+        
+        cell.btnIsChecked.tag = indexPath.row;
+        
+        [cell.btnIsChecked addTarget:self
+                              action:@selector(handleCheckBoxTap:)
+                    forControlEvents:UIControlEventTouchUpInside];
+        
+        return cell;
     }
     else
     {
-        [cell.btnIsChecked setImage:[UIImage imageNamed:isSelectAll == 2 ? @"IMG_UNCHECKED" : @"IMG_CHECKED"] forState:UIControlStateNormal];
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell1"];
+        
+        Products *objProduct = [arrResults objectAtIndex:indexPath.row];
+        cell.textLabel.text = objProduct.productName;
+
+        return cell;
     }
-    
-    cell.btnIsChecked.tag = indexPath.row;
-    
-    [cell.btnIsChecked addTarget:self
-                          action:@selector(handleCheckBoxTap:)
-                forControlEvents:UIControlEventTouchUpInside];
-    
-    return cell;
 }
 
 #pragma mark - Check Box Handling Events
@@ -194,8 +311,6 @@
 - (IBAction)handleCheckBoxTap:(UIButton *)sender
 {
     _vwPopUp.hidden = YES;
-    
-    NSLog(@"I have pressed button at index %ld",(long)[sender tag]);
     
     [UIView transitionWithView:sender
                       duration:0.4
@@ -294,9 +409,6 @@
                     completion:^(BOOL finished){
                         isSelectAll = 0;
                     }];
-
-    
-    //[self.navigationController pushViewController:STORYBOARD_ID(@"idStoreInfoVC") animated:YES];
 }
 
 - (IBAction)btnDeleteAllClicked:(id)sender
@@ -318,6 +430,80 @@
 
 - (IBAction)btnSaveClicked:(id)sender
 {
+    if (productID == 0)
+    {
+        NSLog(@"not save");
+        [AZNotification showNotificationWithTitle:@"Please select valid product"
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
+    else
+    {
+        if([[NetworkAvailability instance] isReachable])
+        {
+            long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+            
+            [[WebServiceConnector alloc]init:URL_AddProductInShoppingList
+                              withParameters:@{
+                                               @"user_id":[NSString stringWithFormat:@"%ld",user_id],
+                                               @"role_id":@"1",
+                                               @"product_id":[NSString stringWithFormat:@"%ld",(long)productID]
+                                               }
+                                  withObject:self
+                                withSelector:@selector(DisplayAddResults:)
+                              forServiceType:@"JSON"
+                              showDisplayMsg:AddProductInShoppingListMsg];
+        }
+        else
+        {
+            [AZNotification showNotificationWithTitle:NETWORK_ERR
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+        }
+    }
+    
+    productID = 0;
+}
+
+- (void)DisplayAddResults:(id)sender
+{
+    [SVProgressHUD dismiss];
+    if ([sender responseCode] != 100)
+    {
+        [AZNotification showNotificationWithTitle:[sender responseError]
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
+    else
+    {
+        if (STATUS([[sender responseDict] valueForKey:@"status"]))
+        {
+            _txtAddItem.text = NULL;
+            [UIView transitionWithView:_vwAddItemContainer
+                              duration:0.4
+                               options:UIViewAnimationOptionTransitionFlipFromLeft
+                            animations:^{
+                                _vwAddItemContainer.hidden = !_vwAddItemContainer.hidden;
+                            }
+                            completion:^(BOOL finished) {
+                                
+                                [self.view endEditing:YES];
+                                
+                                _txtAddItem.enabled = NO;
+                                
+                                arrShoppingList = [sender responseArray];
+                                
+                                [_tblShoppingList reloadData];
+
+                            }];
+        }
+        else
+        {
+            [AZNotification showNotificationWithTitle:[[sender responseDict] valueForKey:@"message"]
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+        }
+    }
 }
 
 - (IBAction)btnCancelClicked:(id)sender
