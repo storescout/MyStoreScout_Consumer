@@ -333,6 +333,8 @@
                                 if([[NetworkAvailability instance] isReachable])
                                 {
                                     long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+                                    
+                                    [SVProgressHUD showWithStatus:EditProfileMsg];
 
                                     [[WebServiceConnector alloc]init:URL_EditProfile
                                                       withParameters:@{
@@ -383,6 +385,8 @@
                     {
 
                         long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+                        
+                        [SVProgressHUD showWithStatus:EditProfileMsg];
 
                         [[WebServiceConnector alloc]init:URL_EditProfile
                                           withParameters:@{

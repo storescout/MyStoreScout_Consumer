@@ -80,9 +80,6 @@
                                                    options:NSStringDrawingUsesLineFragmentOrigin
                                                 attributes:@{NSFontAttributeName: label.font}
                                                    context:nil];
-//    CGSize sizeOfText = [label.text sizeWithFont:label.font
-//                               constrainedToSize:label.frame.size
-//                                   lineBreakMode:UILineBreakModeWordWrap];
     return sizeOfText.size.height / label.font.pointSize;
 }
 

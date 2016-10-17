@@ -15,6 +15,9 @@
     
     BOOL isWalkingPath; // check if object is walking path
     BOOL isBeacon; // check if object is beacon
+    
+    UIImageView *imgEntry;
+    UIImageView *imgExit;
 }
 @end
 
@@ -50,22 +53,55 @@
             
             Racks *rack = [_objStore.racks objectAtIndex:i];
             
-            if ([rack.rackType isEqualToString:@"2"])
+            if ([rack.rackType isEqualToString:@"6"])
             {
-                isWalkingPath = YES;
+                
+                CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
+                CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
+                CGFloat width = [self convertSquareFeetToPixelsForHorizontalValue:[rack.rackWidth floatValue]];
+                CGFloat height = [self convertSquareFeetToPixelsForVerticalValue:[rack.rackHeight floatValue]];
+                
+                [self addEntryPointForX:X
+                                   andY:Y
+                               forWidth:width
+                              andHeight:height];
+                
             }
             
-            shapeLayer = [rack.rackType isEqualToString:@"4"] ? [self initializeBeaconLayer] : [self initializeShapeLayerWithID:rack.rackType];
+            else if ([rack.rackType isEqualToString:@"7"])
+            {
+                
+                CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
+                CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
+                CGFloat width = [self convertSquareFeetToPixelsForHorizontalValue:[rack.rackWidth floatValue]];
+                CGFloat height = [self convertSquareFeetToPixelsForVerticalValue:[rack.rackHeight floatValue]];
+                
+                [self addExitPointForX:X
+                                  andY:Y
+                              forWidth:width
+                             andHeight:height];
+                
+            }
+            else
+            {
             
-            CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
-            CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
-            CGFloat width = [self convertSquareFeetToPixelsForHorizontalValue:[rack.rackWidth floatValue]];
-            CGFloat height = [self convertSquareFeetToPixelsForVerticalValue:[rack.rackHeight floatValue]];
-            
-            shapeLayer.path = [self drawRackFromStartingX:X
-                                                     andY:Y
-                                                withWidth:width
-                                                andHeight:height].CGPath;
+                if ([rack.rackType isEqualToString:@"2"])
+                {
+                    isWalkingPath = YES;
+                }
+                
+                shapeLayer = [rack.rackType isEqualToString:@"4"] ? [self initializeBeaconLayer] : [self initializeShapeLayerWithID:rack.rackType];
+                
+                CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
+                CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
+                CGFloat width = [self convertSquareFeetToPixelsForHorizontalValue:[rack.rackWidth floatValue]];
+                CGFloat height = [self convertSquareFeetToPixelsForVerticalValue:[rack.rackHeight floatValue]];
+                
+                shapeLayer.path = [self drawRackFromStartingX:X
+                                                         andY:Y
+                                                    withWidth:width
+                                                    andHeight:height].CGPath;
+            }
         }
         [SVProgressHUD dismiss];
     }
@@ -135,6 +171,30 @@
     }
     
     return path;
+}
+
+#pragma mark -  Adding Entry Point to Store
+
+- (void)addEntryPointForX:(CGFloat)X
+                     andY:(CGFloat)Y
+                 forWidth:(CGFloat)width
+                andHeight:(CGFloat)height
+{
+    imgEntry = [[UIImageView alloc] initWithFrame:CGRectMake(X, Y, width, height)];
+    [imgEntry setImage:[UIImage imageNamed:@"Entry"]];
+    [_imgBackground addSubview:imgEntry];
+}
+
+#pragma mark -  Adding Exit Point to Store
+
+- (void)addExitPointForX:(CGFloat)X
+                    andY:(CGFloat)Y
+                forWidth:(CGFloat)width
+               andHeight:(CGFloat)height
+{
+    imgExit = [[UIImageView alloc] initWithFrame:CGRectMake(X, Y, width, height)];
+    [imgExit setImage:[UIImage imageNamed:@"Exit"]];
+    [_imgBackground addSubview:imgExit];
 }
 
 #pragma mark - Unit Converters

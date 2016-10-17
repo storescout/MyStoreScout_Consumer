@@ -82,6 +82,8 @@
         {
             NSString *strDeviceToken = [DefaultsValues getStringValueFromUserDefaults_ForKey:KEY_DEVICE_TOKEN];
             
+            [SVProgressHUD showWithStatus:LoginMsg];
+            
             [[WebServiceConnector alloc]init:URL_Login
                               withParameters:@{
                                                @"username":_txtusername.text,
@@ -196,6 +198,8 @@
     {
        if([[NetworkAvailability instance] isReachable])
        {
+           [SVProgressHUD showWithStatus:ForgotPasswordMsg];
+           
            [[WebServiceConnector alloc]init:URL_ForgotPassword
                              withParameters:@{
                                               @"email_id":strEmail,

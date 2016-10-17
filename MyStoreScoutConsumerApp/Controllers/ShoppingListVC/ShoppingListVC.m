@@ -72,6 +72,8 @@
     {
         long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
         
+        [SVProgressHUD showWithStatus:GetAllProductsMsg];
+        
         [[WebServiceConnector alloc]init:URL_GetShoppingList
                           withParameters:@{
                                            @"user_id":[NSString stringWithFormat:@"%ld",user_id],
@@ -220,9 +222,15 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return tableView == _tblShoppingList ? arrShoppingList.count : [[BaseVC sharedInstance] getRowsforTable:tableView
-                                                                                                   forArray:arrResults
-                                                                                            withPlaceHolder:@"No Result Found"];
+    return tableView == _tblShoppingList ?
+    
+    [[BaseVC sharedInstance] getRowsforTable:tableView
+                                    forArray:(NSMutableArray *)arrShoppingList
+                             withPlaceHolder:@"No Products Found"] :
+    
+    [[BaseVC sharedInstance] getRowsforTable:tableView
+                                    forArray:arrResults
+                             withPlaceHolder:@"No Result Found"];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -312,13 +320,45 @@
 {
     _vwPopUp.hidden = YES;
     
+    BOOL isBought = [[BaseVC sharedInstance] image:sender.imageView.image isEqualTo:[UIImage imageNamed:@"IMG_CHECKED"]];
+    
     [UIView transitionWithView:sender
                       duration:0.4
                        options:UIViewAnimationOptionTransitionFlipFromLeft
                     animations:^{
-                        [sender setImage:[UIImage imageNamed:[[BaseVC sharedInstance] image:sender.imageView.image isEqualTo:[UIImage imageNamed:@"IMG_CHECKED"]] ? @"IMG_UNCHECKED" : @"IMG_CHECKED"] forState:UIControlStateNormal];
+                        [sender setImage:[UIImage imageNamed:isBought ? @"IMG_UNCHECKED" : @"IMG_CHECKED"] forState:UIControlStateNormal];
                     }
                     completion:nil];
+    
+    ShoppingList *objShoppingList = [arrShoppingList objectAtIndex:sender.tag];
+    
+    
+    if([[NetworkAvailability instance] isReachable])
+    {
+        long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+        
+        [SVProgressHUD showWithStatus:CheckShoppingListProductAsBoughtMsg];
+        
+        [[WebServiceConnector alloc]init:URL_CheckShoppingListProductAsBought
+                          withParameters:@{
+                                           @"user_id":[NSString stringWithFormat:@"%ld",user_id],
+                                           @"id":objShoppingList.shoppingListIdentifier,
+                                           @"is_bought":isBought ? @"0" : @"1"
+                                           }
+                              withObject:self
+                            withSelector:@selector(DisplayResults:)
+                          forServiceType:@"JSON"
+                          showDisplayMsg:CheckShoppingListProductAsBoughtMsg];
+    }
+    else
+    {
+        [AZNotification showNotificationWithTitle:NETWORK_ERR
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
+
+
+    NSLog(@"%@",objShoppingList.shoppingListIdentifier);
 }
 
 #pragma mark - UIScrollView Delegate Methods
@@ -442,6 +482,8 @@
         if([[NetworkAvailability instance] isReachable])
         {
             long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+            
+            [SVProgressHUD showWithStatus:AddProductInShoppingListMsg];
             
             [[WebServiceConnector alloc]init:URL_AddProductInShoppingList
                               withParameters:@{

@@ -261,6 +261,8 @@
                         NSString *strDeviceToken = [DefaultsValues getStringValueFromUserDefaults_ForKey:KEY_DEVICE_TOKEN];
                         NSString *strDeviceUDID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
                         
+                        [SVProgressHUD showWithStatus:RegistrationMsg];
+                        
                         [[WebServiceConnector alloc]init:URL_Registration
                                           withParameters:@{
                                                            @"firstname":@"Bhargav",

@@ -99,6 +99,13 @@
                                     forEntity:AddProductInShoppingListEntity
                                   withJSONKey:AddProductInShoppingListKey];
     }
+    else if (isService(URL_CheckShoppingListProductAsBought))
+    {
+        arrParsedData = [self processJSONData:allValues
+                                     forClass:CheckShoppingListProductAsBoughtClass
+                                    forEntity:CheckShoppingListProductAsBoughtEntity
+                                  withJSONKey:CheckShoppingListProductAsBoughtKey];
+    }
 
     return arrParsedData;
 }

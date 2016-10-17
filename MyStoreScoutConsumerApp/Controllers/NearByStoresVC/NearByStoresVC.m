@@ -56,6 +56,8 @@
 {
     if([[NetworkAvailability instance] isReachable])
     {
+        [SVProgressHUD showWithStatus:GetAllStoresMsg];
+        
         long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
         
         [[WebServiceConnector alloc]init:URL_GetAllStores

@@ -46,6 +46,8 @@
 
 #define URL_AddProductInShoppingList [NSString stringWithFormat:@"%sAddProductInShoppingList",Server_URL]
 
+#define URL_CheckShoppingListProductAsBought [NSString stringWithFormat:@"%sCheckShoppingListProductAsBought",Server_URL]
+
 
 /* ============================================================================ */
 #pragma mark - Class,Json Key and Message
@@ -81,6 +83,11 @@
 #define GetShoppingListEntity @""
 #define GetShoppingListKey @"data"
 #define GetShoppingListMsg [NSString stringWithFormat:@"Loading Shopping List"]
+
+#define CheckShoppingListProductAsBoughtClass @"ShoppingList"
+#define CheckShoppingListProductAsBoughtEntity @""
+#define CheckShoppingListProductAsBoughtKey @"data"
+#define CheckShoppingListProductAsBoughtMsg [NSString stringWithFormat:@"Loading Shopping List"]
 
 #define SearchProductsClass @"Products"
 #define SearchProductsEntity @""
