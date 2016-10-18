@@ -11,13 +11,11 @@
 
 @interface StoreVC ()
 {
-    CAShapeLayer *shapeLayer; // all the object initiator
-    
     BOOL isWalkingPath; // check if object is walking path
-    BOOL isBeacon; // check if object is beacon
-    
+
     UIImageView *imgEntry;
     UIImageView *imgExit;
+    CAShapeLayer *shapeLayer; // all the object initiator
 }
 @end
 
@@ -26,6 +24,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
     _lblTitle.text = _objStore.storeName;
 }
 
@@ -214,6 +213,11 @@
 - (IBAction)btnBackClicked:(id)sender
 {
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)btnShoppingListClicked:(id)sender
+{
+    [self.navigationController pushViewController:STORYBOARD_ID(@"idShoppingListVC") animated:YES];
 }
 
 @end

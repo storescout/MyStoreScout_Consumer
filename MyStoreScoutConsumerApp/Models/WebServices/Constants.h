@@ -48,6 +48,11 @@
 
 #define URL_CheckShoppingListProductAsBought [NSString stringWithFormat:@"%sCheckShoppingListProductAsBought",Server_URL]
 
+#define URL_DeleteProductFromShoppingList [NSString stringWithFormat:@"%sDeleteProductFromShoppingList",Server_URL]
+
+#define URL_CheckAllShoppingListProductsAsBought [NSString stringWithFormat:@"%sCheckAllShoppingListProductsAsBought",Server_URL]
+
+#define URL_DeleteAllProductsFromShoppingList [NSString stringWithFormat:@"%sDeleteAllProductsFromShoppingList",Server_URL]
 
 /* ============================================================================ */
 #pragma mark - Class,Json Key and Message
@@ -88,6 +93,21 @@
 #define CheckShoppingListProductAsBoughtEntity @""
 #define CheckShoppingListProductAsBoughtKey @"data"
 #define CheckShoppingListProductAsBoughtMsg [NSString stringWithFormat:@"Loading Shopping List"]
+
+#define CheckAllShoppingListProductsAsBoughtClass @"ShoppingList"
+#define CheckAllShoppingListProductsAsBoughtEntity @""
+#define CheckAllShoppingListProductsAsBoughtKey @"data"
+#define CheckAllShoppingListProductsAsBoughtMsg [NSString stringWithFormat:@"Loading Shopping List"]
+
+#define DeleteProductFromShoppingListClass @"ShoppingList"
+#define DeleteProductFromShoppingListEntity @""
+#define DeleteProductFromShoppingListKey @"data"
+#define DeleteProductFromShoppingListMsg [NSString stringWithFormat:@"Loading Shopping List"]
+
+#define DeleteAllProductsFromShoppingListClass @"ShoppingList"
+#define DeleteAllProductsFromShoppingListEntity @""
+#define DeleteAllProductsFromShoppingListKey @"data"
+#define DeleteAllProductsFromShoppingListMsg [NSString stringWithFormat:@"Loading Shopping List"]
 
 #define SearchProductsClass @"Products"
 #define SearchProductsEntity @""

@@ -106,6 +106,27 @@
                                     forEntity:CheckShoppingListProductAsBoughtEntity
                                   withJSONKey:CheckShoppingListProductAsBoughtKey];
     }
+    else if (isService(URL_DeleteProductFromShoppingList))
+    {
+        arrParsedData = [self processJSONData:allValues
+                                     forClass:DeleteProductFromShoppingListClass
+                                    forEntity:DeleteProductFromShoppingListEntity
+                                  withJSONKey:DeleteProductFromShoppingListKey];
+    }
+    else if (isService(URL_CheckAllShoppingListProductsAsBought))
+    {
+        arrParsedData = [self processJSONData:allValues
+                                     forClass:CheckAllShoppingListProductsAsBoughtClass
+                                    forEntity:CheckAllShoppingListProductsAsBoughtEntity
+                                  withJSONKey:CheckAllShoppingListProductsAsBoughtKey];
+    }
+    else if (isService(URL_DeleteAllProductsFromShoppingList))
+    {
+        arrParsedData = [self processJSONData:allValues
+                                     forClass:DeleteAllProductsFromShoppingListClass
+                                    forEntity:DeleteAllProductsFromShoppingListEntity
+                                  withJSONKey:DeleteAllProductsFromShoppingListKey];
+    }
 
     return arrParsedData;
 }

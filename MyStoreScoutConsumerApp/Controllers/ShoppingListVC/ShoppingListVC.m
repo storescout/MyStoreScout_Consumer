@@ -13,7 +13,6 @@
 
 @interface ShoppingListVC ()
 {
-    NSInteger isSelectAll;
     NSArray *arrShoppingList;
     NSMutableArray *arrResults;
     UIRefreshControl *refreshControl;
@@ -27,7 +26,6 @@
 {
     [super viewDidLoad];
     
-    isSelectAll = 0;
     productID = 0;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.00001 * NSEC_PER_SEC), dispatch_get_main_queue(),^
@@ -62,6 +60,26 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
+}
+
+#pragma mark - Custom Methods
+
+- (void)closeAddItemPopUp
+{
+    [UIView transitionWithView:_vwAddItemContainer
+                      duration:0.4
+                       options:UIViewAnimationOptionTransitionFlipFromLeft
+                    animations:^{
+                        _vwAddItemContainer.hidden = !_vwAddItemContainer.hidden;
+                    }
+                    completion:^(BOOL finished) {
+                        [self.view endEditing:YES];
+                        _txtAddItem.text = NULL;
+                        _txtAddItem.enabled = NO;
+                        [arrResults removeAllObjects];
+                        [_tblResults reloadData];
+                        [_tblResults setHidden:YES];
+                    }];
 }
 
 #pragma mark - WS Call
@@ -121,16 +139,7 @@
 {
     if (!CGRectContainsRect(_vwAddItem.frame, CGRectMake([sender locationInView:self.view].x, [sender locationInView:self.view].y, 1, 1)))
     {
-        [UIView transitionWithView:_vwAddItemContainer
-                          duration:0.4
-                           options:UIViewAnimationOptionTransitionFlipFromLeft
-                        animations:^{
-                            _vwAddItemContainer.hidden = !_vwAddItemContainer.hidden;
-                        }
-                        completion:^(BOOL finished) {
-                            [self.view endEditing:YES];
-                            _txtAddItem.enabled = NO;
-                        }];
+        [self closeAddItemPopUp];
     }
 }
 
@@ -241,6 +250,48 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:APP_NAME
+                                                                   message:@"Do you want to remove this product from shopping list?"
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *btnYes = [UIAlertAction actionWithTitle:@"Yes"
+                                                     style:UIAlertActionStyleDefault
+                                                   handler:^(UIAlertAction * action)
+                             {
+                                 ShoppingList *objShoppingList = [arrShoppingList objectAtIndex:indexPath.row];
+                                 NSLog(@"%@",objShoppingList.shoppingListIdentifier);
+                                 
+                                 if([[NetworkAvailability instance] isReachable])
+                                 {
+                                     long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+                                     
+                                     [SVProgressHUD showWithStatus:DeleteProductFromShoppingListMsg];
+                                     
+                                     [[WebServiceConnector alloc]init:URL_DeleteProductFromShoppingList
+                                                       withParameters:@{
+                                                                        @"user_id":[NSString stringWithFormat:@"%ld",user_id],
+                                                                        @"id":objShoppingList.shoppingListIdentifier
+                                                                        }
+                                                           withObject:self
+                                                         withSelector:@selector(DisplayResults:)
+                                                       forServiceType:@"JSON"
+                                                       showDisplayMsg:DeleteProductFromShoppingListMsg];
+                                 }
+                                 else
+                                 {
+                                     [AZNotification showNotificationWithTitle:NETWORK_ERR
+                                                                    controller:self
+                                                              notificationType:AZNotificationTypeError];
+                                 }
+                             }];
+    
+    UIAlertAction *btnNo = [UIAlertAction actionWithTitle:@"Cancel"
+                                                    style:UIAlertActionStyleDefault
+                                                  handler:^(UIAlertAction * action) {}];
+    
+    [alert addAction:btnNo];
+    [alert addAction:btnYes];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -286,14 +337,7 @@
         
         cell.contentView.backgroundColor = indexPath.row % 2 == 0 ? [UIColor whiteColor] : rgb(242, 242, 242, 1.0);
         
-        if (isSelectAll == 0)
-        {
-            [cell.btnIsChecked setImage:[UIImage imageNamed:[objShoppingList.isBought boolValue] ? @"IMG_CHECKED" : @"IMG_UNCHECKED"] forState:UIControlStateNormal];
-        }
-        else
-        {
-            [cell.btnIsChecked setImage:[UIImage imageNamed:isSelectAll == 2 ? @"IMG_UNCHECKED" : @"IMG_CHECKED"] forState:UIControlStateNormal];
-        }
+        [cell.btnIsChecked setImage:[UIImage imageNamed:[objShoppingList.isBought boolValue] ? @"IMG_CHECKED" : @"IMG_UNCHECKED"] forState:UIControlStateNormal];
         
         cell.btnIsChecked.tag = indexPath.row;
         
@@ -436,35 +480,89 @@
 
 - (IBAction)btnSelectClicked:(id)sender
 {
-    isSelectAll = 1;
-    
-    _vwPopUp.hidden = YES;
-    
-    [UIView transitionWithView:_tblShoppingList
+    [UIView transitionWithView:_vwPopUp
                       duration:0.35f
                        options:UIViewAnimationOptionTransitionFlipFromLeft
                     animations:^(void) {
-                        [_tblShoppingList reloadData];
+                        _vwPopUp.hidden = YES;
                     }
                     completion:^(BOOL finished){
-                        isSelectAll = 0;
+                        if([[NetworkAvailability instance] isReachable])
+                        {
+                            long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+                            
+                            [SVProgressHUD showWithStatus:CheckAllShoppingListProductsAsBoughtMsg];
+                            
+                            [[WebServiceConnector alloc]init:URL_CheckAllShoppingListProductsAsBought
+                                              withParameters:@{
+                                                               @"user_id":[NSString stringWithFormat:@"%ld",user_id],
+                                                               }
+                                                  withObject:self
+                                                withSelector:@selector(DisplayResults:)
+                                              forServiceType:@"JSON"
+                                              showDisplayMsg:CheckAllShoppingListProductsAsBoughtMsg];
+                        }
+                        else
+                        {
+                            [AZNotification showNotificationWithTitle:NETWORK_ERR
+                                                           controller:self
+                                                     notificationType:AZNotificationTypeError];
+                        }
                     }];
 }
 
 - (IBAction)btnDeleteAllClicked:(id)sender
 {
-    isSelectAll = 2;
-    
-    _vwPopUp.hidden = YES;
-    
-    [UIView transitionWithView:_tblShoppingList
+
+//    isSelectAll = 2;
+//    
+//    _vwPopUp.hidden = YES;
+//    
+    [UIView transitionWithView:_vwPopUp
                       duration:0.35f
                        options:UIViewAnimationOptionTransitionFlipFromLeft
                     animations:^(void) {
-                        [_tblShoppingList reloadData];
+                        _vwPopUp.hidden = YES;
                     }
                     completion:^(BOOL finished){
-                        isSelectAll = 2;
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:APP_NAME
+                                                                                       message:@"Are you sure you want to remove all items from shopping list?"
+                                                                                preferredStyle:UIAlertControllerStyleAlert];
+                        
+                        UIAlertAction *btnYes = [UIAlertAction actionWithTitle:@"Yes"
+                                                                         style:UIAlertActionStyleDefault
+                                                                       handler:^(UIAlertAction * action)
+                                                 {
+                                                     if([[NetworkAvailability instance] isReachable])
+                                                     {
+                                                         long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+                                                         
+                                                         [SVProgressHUD showWithStatus:DeleteAllProductsFromShoppingListMsg];
+                                                         
+                                                         [[WebServiceConnector alloc]init:URL_DeleteAllProductsFromShoppingList
+                                                                           withParameters:@{
+                                                                                            @"user_id":[NSString stringWithFormat:@"%ld",user_id],
+                                                                                            }
+                                                                               withObject:self
+                                                                             withSelector:@selector(DisplayResults:)
+                                                                           forServiceType:@"JSON"
+                                                                           showDisplayMsg:DeleteAllProductsFromShoppingListMsg];
+                                                     }
+                                                     else
+                                                     {
+                                                         [AZNotification showNotificationWithTitle:NETWORK_ERR
+                                                                                        controller:self
+                                                                                  notificationType:AZNotificationTypeError];
+                                                     }
+                                                 }];
+                        
+                        UIAlertAction *btnNo = [UIAlertAction actionWithTitle:@"Cancel"
+                                                                        style:UIAlertActionStyleDefault
+                                                                      handler:^(UIAlertAction * action) {}];
+                        
+                        [alert addAction:btnNo];
+                        [alert addAction:btnYes];
+                        [self presentViewController:alert animated:YES completion:nil];
                     }];
 }
 

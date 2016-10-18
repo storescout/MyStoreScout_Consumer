@@ -16,6 +16,7 @@
     double lontitude;
     BOOL isFirstTime;
     NSArray *arrStores;
+    NSArray *arrTempStores;
     CLLocationCoordinate2D coordinates;
 }
 @end
@@ -92,6 +93,8 @@
         {
             arrStores = [sender responseArray];
             
+            arrTempStores = [arrStores copy];
+            
             [_tblSearchResults reloadData];
             
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -102,9 +105,9 @@
             });
 
             
-            for (int i = 0; i<arrStores.count; i++)
+            for (int i = 0; i<arrTempStores.count; i++)
             {
-                Store *objStore = [arrStores objectAtIndex:i];
+                Store *objStore = [arrTempStores objectAtIndex:i];
                 
                 MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
                 [annotation setCoordinate:CLLocationCoordinate2DMake([objStore.latitude floatValue], [objStore.longitude floatValue])];
@@ -180,19 +183,26 @@
 -(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
 {
     _tblSearchResults.hidden = searchText.length > 0 ? NO : YES;
+    
+    NSPredicate *pred =[NSPredicate predicateWithFormat:@"storeName CONTAINS[c] %@", searchText];//CONTAINS[c]
+    arrTempStores = [arrStores filteredArrayUsingPredicate:pred];
+    [_tblSearchResults reloadData];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         //This code will run in the main thread:
         CGRect frame = _tblSearchResults.frame;
         frame.size.height = _tblSearchResults.contentSize.height;
         _tblSearchResults.frame = frame;
+        
     });
+    //Store *objStore = [arrTempStores objectAtIndex:indexPath.row];
 }
 
 #pragma mark - TableView Delegate Methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return arrStores.count;
+    return arrTempStores.count;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -203,7 +213,7 @@
     
     [_searchBar resignFirstResponder];
 
-    Store *objStore = [arrStores objectAtIndex:indexPath.row];
+    Store *objStore = [arrTempStores objectAtIndex:indexPath.row];
     
     _mapView.centerCoordinate = CLLocationCoordinate2DMake([objStore.latitude floatValue], [objStore.longitude floatValue]);
     
@@ -222,7 +232,7 @@
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
 
-    Store *objStore = [arrStores objectAtIndex:indexPath.row];
+    Store *objStore = [arrTempStores objectAtIndex:indexPath.row];
 
     cell.textLabel.text = objStore.storeName;
     
@@ -241,7 +251,6 @@
             self.locationManager.delegate = self;
             self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
             self.locationManager.distanceFilter = kCLDistanceFilterNone;
-            [self.locationManager requestWhenInUseAuthorization];
             [self.locationManager requestAlwaysAuthorization];
         }
     }

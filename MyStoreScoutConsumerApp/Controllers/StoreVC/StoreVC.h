@@ -15,9 +15,11 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnBack;
 @property (weak, nonatomic) IBOutlet UIImageView *imgBackground;
 @property (weak, nonatomic) IBOutlet UIView *vwTopBar;
+@property (weak, nonatomic) IBOutlet UIButton *btnShoppingList;
 
 @property (nonatomic, strong) Store *objStore;
 
 - (IBAction)btnBackClicked:(id)sender;
+- (IBAction)btnShoppingListClicked:(id)sender;
 
 @end

@@ -44,12 +44,6 @@
     });
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    
-}
-
 - (void)contactNumberTapped:(UITapGestureRecognizer *)sender
 {
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"telprompt://%@", _lblContactNumber.text]];
