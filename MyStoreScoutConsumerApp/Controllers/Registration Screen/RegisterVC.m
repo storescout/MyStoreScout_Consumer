@@ -32,7 +32,9 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    
     [self setNeedsStatusBarAppearanceUpdate];
 }
 
@@ -120,7 +122,7 @@
             imagePickerController= [[UIImagePickerController alloc] init];
             imagePickerController.delegate = self;
             imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-            [self presentViewController:imagePickerController animated:YES completion:^{}];
+            [self presentViewController:imagePickerController animated:YES completion:nil];
         }
         else
         {
@@ -136,18 +138,10 @@
     else if ((buttonIndex == 1 && actionSheet.tag == 0) || (buttonIndex == 2 && actionSheet.tag == 1))
     {
         [self.view endEditing:YES];
-        [SVProgressHUD showWithStatus:@"Please wait"];
-        
-        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void)
-        {
-            imagePickerController = [[UIImagePickerController alloc] init];
-            imagePickerController.delegate = self;
-            imagePickerController.sourceType =  UIImagePickerControllerSourceTypePhotoLibrary;
-            [self presentViewController:imagePickerController animated:YES completion:^
-            {
-                [SVProgressHUD dismiss];
-            }];
-        });
+        imagePickerController = [[UIImagePickerController alloc] init];
+        imagePickerController.delegate = self;
+        imagePickerController.sourceType =  UIImagePickerControllerSourceTypePhotoLibrary;
+        [self presentViewController:imagePickerController animated:YES completion:nil];
     }
     else if(buttonIndex == 0)
     {
@@ -252,7 +246,7 @@
     {
         if ([_txtEmailAddress.text isValidEmail])
         {
-            if ([_txtMobileNumber.text isValidPhoneNumber])
+            if (_txtMobileNumber.text.length == 7)
             {
                 if ([_txtPassword.text isValidPassword])
                 {

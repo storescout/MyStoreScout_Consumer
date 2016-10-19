@@ -54,9 +54,9 @@ static char TAG_ACTIVITY_SHOW;
     if (url) {
 
         // check if activityView is enabled or not
-//        if ([self showActivityIndicatorView]) {
+        if ([self showActivityIndicatorView]) {
             [self addActivityIndicator];
-//        }
+        }
 
         __weak __typeof(self)wself = self;
         id <SDWebImageOperation> operation = [SDWebImageManager.sharedManager downloadImageWithURL:url options:options progress:progressBlock completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {

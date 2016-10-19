@@ -133,19 +133,21 @@
 
 -(NSArray *) processJSONData: (NSDictionary *)dict forClass:(NSString *)classname forEntity:(NSString *)entityname withJSONKey:(NSString *)json_Key
 {
-    
-    if ([[dict objectForKey:json_Key] objectForKey:classname] != (id)[NSNull null])
+    if ([dict objectForKey:json_Key] != (id)[NSNull null])
     {
-        NSMutableArray *arrProcessedData = [NSMutableArray array];
-        //[CoreDataAdaptor deleteDataInCoreDB:entityname];
-        for(int i =0;i<[[[dict objectForKey:json_Key] objectForKey:classname] count];i++)
+        if ([[dict objectForKey:json_Key] objectForKey:classname] != (id)[NSNull null])
         {
-            NSMutableDictionary *allvalues = [[[[dict objectForKey:json_Key] objectForKey:classname] objectAtIndex:i] mutableCopy];
-            id objClass = [[[NSClassFromString(classname) alloc] init] initWithDictionary:allvalues];
-            [arrProcessedData addObject:objClass];
-            
+            NSMutableArray *arrProcessedData = [NSMutableArray array];
+            //[CoreDataAdaptor deleteDataInCoreDB:entityname];
+            for(int i =0;i<[[[dict objectForKey:json_Key] objectForKey:classname] count];i++)
+            {
+                NSMutableDictionary *allvalues = [[[[dict objectForKey:json_Key] objectForKey:classname] objectAtIndex:i] mutableCopy];
+                id objClass = [[[NSClassFromString(classname) alloc] init] initWithDictionary:allvalues];
+                [arrProcessedData addObject:objClass];
+                
+            }
+            return arrProcessedData;
         }
-        return arrProcessedData;
     }
     return nil;
 }

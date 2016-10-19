@@ -44,8 +44,11 @@
 #define Label_Width 70
 #define Label_Height 25
 
-#define BEACON_WIDTH 50
-#define BEACON_HEIGHT 50
+#define BEACON_WIDTH 25
+#define BEACON_HEIGHT 25
+
+#define ENTRY_EXIT_WIDTH 40
+#define ENTRY_EXIT_HEIGHT 40
 
 #define SMALL_SPACE 10
 

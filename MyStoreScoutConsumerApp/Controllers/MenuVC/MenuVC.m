@@ -70,7 +70,7 @@
     {
         [DefaultsValues setIntegerValueToUserDefaults:-1 ForKey:KEY_SELECTED_MENU];
         [_tblMenu reloadData];
-        [self navigateToViewController:[self.storyboard instantiateViewControllerWithIdentifier:@"idProfileVC"]];
+        [self navigateToViewController:STORYBOARD_ID(@"idProfileVC")];
     }
 }
 
@@ -88,8 +88,8 @@
     }
     
     [APP_CONTEXT.drawerController setCenterViewController:navigation
-                               withCloseAnimation:YES
-                                       completion:nil];
+                                       withCloseAnimation:YES
+                                               completion:nil];
 }
 
 #pragma mark - TableView Delegate Methods
@@ -111,8 +111,10 @@
     {
         [DefaultsValues setIntegerValueToUserDefaults:(int)indexPath.row ForKey:KEY_SELECTED_MENU];
         [tableView reloadData];
+        
+//        STORYBOARD_ID(indexPath.row == 0 ? @"idStoresVC" : @"idShoppingListVC");
 
-        [self navigateToViewController:[self.storyboard instantiateViewControllerWithIdentifier:indexPath.row == 0 ? @"idStoresVC" : @"idShoppingListVC"]];
+        [self navigateToViewController:STORYBOARD_ID(indexPath.row == 0 ? @"idStoresVC" : @"idShoppingListVC")];
     }
     
 }

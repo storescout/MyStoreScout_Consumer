@@ -12,6 +12,7 @@
 @interface StoreVC ()
 {
     BOOL isWalkingPath; // check if object is walking path
+    BOOL isBeacon; // check if object is beacon
 
     UIImageView *imgEntry;
     UIImageView *imgExit;
@@ -49,6 +50,7 @@
         for (int i = 0; i < _objStore.racks.count; i++)
         {
             isWalkingPath = NO;
+            isBeacon = NO;
             
             Racks *rack = [_objStore.racks objectAtIndex:i];
             
@@ -57,8 +59,28 @@
                 
                 CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
                 CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
-                CGFloat width = [self convertSquareFeetToPixelsForHorizontalValue:[rack.rackWidth floatValue]];
-                CGFloat height = [self convertSquareFeetToPixelsForVerticalValue:[rack.rackHeight floatValue]];
+                
+                if (X == 0.00)
+                {
+                    Y = Y - HALF(ENTRY_EXIT_HEIGHT);
+                }
+                else if (Y == 0.00)
+                {
+                    X = X - HALF(ENTRY_EXIT_WIDTH);
+                }
+                else if (X == _imgBackground.frame.size.width)
+                {
+                    X = X - ENTRY_EXIT_WIDTH;
+                    Y = Y - HALF(ENTRY_EXIT_HEIGHT);
+                }
+                else if (Y == _imgBackground.frame.size.height)
+                {
+                    X = X - HALF(ENTRY_EXIT_WIDTH);
+                    Y = Y - ENTRY_EXIT_HEIGHT;
+                }
+                
+                CGFloat width = ENTRY_EXIT_WIDTH;
+                CGFloat height = ENTRY_EXIT_HEIGHT;
                 
                 [self addEntryPointForX:X
                                    andY:Y
@@ -72,8 +94,28 @@
                 
                 CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
                 CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
-                CGFloat width = [self convertSquareFeetToPixelsForHorizontalValue:[rack.rackWidth floatValue]];
-                CGFloat height = [self convertSquareFeetToPixelsForVerticalValue:[rack.rackHeight floatValue]];
+                
+                if (X == 0.00)
+                {
+                    Y = Y - HALF(ENTRY_EXIT_HEIGHT);
+                }
+                else if (Y == 0.00)
+                {
+                    X = X - HALF(ENTRY_EXIT_WIDTH);
+                }
+                else if (X == _imgBackground.frame.size.width)
+                {
+                    X = X - ENTRY_EXIT_WIDTH;
+                    Y = Y - HALF(ENTRY_EXIT_HEIGHT);
+                }
+                else if (Y == _imgBackground.frame.size.height)
+                {
+                    X = X - HALF(ENTRY_EXIT_WIDTH);
+                    Y = Y - ENTRY_EXIT_HEIGHT;
+                }
+                
+                CGFloat width = ENTRY_EXIT_WIDTH;
+                CGFloat height = ENTRY_EXIT_HEIGHT;
                 
                 [self addExitPointForX:X
                                   andY:Y
@@ -88,13 +130,26 @@
                 {
                     isWalkingPath = YES;
                 }
+                else if ([rack.rackType isEqualToString:@"4"])
+                {
+                    isBeacon = YES;
+                }
                 
-                shapeLayer = [rack.rackType isEqualToString:@"4"] ? [self initializeBeaconLayer] : [self initializeShapeLayerWithID:rack.rackType];
+                shapeLayer = isBeacon ? [self initializeBeaconLayer] : [self initializeShapeLayerWithID:rack.rackType];
                 
                 CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
                 CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
                 CGFloat width = [self convertSquareFeetToPixelsForHorizontalValue:[rack.rackWidth floatValue]];
                 CGFloat height = [self convertSquareFeetToPixelsForVerticalValue:[rack.rackHeight floatValue]];
+                
+                if (isBeacon)
+                {
+                    X = X - HALF(BEACON_WIDTH);
+                    Y = Y - HALF(BEACON_HEIGHT);
+                    width = BEACON_WIDTH;
+                    height = BEACON_HEIGHT;
+                }
+
                 
                 shapeLayer.path = [self drawRackFromStartingX:X
                                                          andY:Y
