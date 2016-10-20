@@ -42,6 +42,8 @@
 {
     [super viewWillAppear:animated];
     
+//    [_tblMenu reloadData];
+    
     User *objUser = [DefaultsValues getCustomObjFromUserDefaults_ForKey:KEY_USER];
     
     _lblFullName.text = [NSString stringWithFormat:@"%@ %@",objUser.firstName, objUser.lastName];

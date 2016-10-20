@@ -8,6 +8,7 @@
 
 #import "StoreVC.h"
 #import "Racks.h"
+#import "MenuVC.h"
 
 @interface StoreVC ()
 {
@@ -43,6 +44,23 @@
 {
     [super viewDidAppear:animated];
     
+//    CGPoint currentLocation = [self getCoordinateWithBeaconA:CGPointMake(50, 50)
+//                                                     beaconB:CGPointMake(300, 200)
+//                                                     beaconC:CGPointMake(50, 300)
+//                                                   distanceA:150
+//                                                   distanceB:250
+//                                                   distanceC:100];
+    
+    CGPoint currentLocation = [self getCoordinateWithBeaconA:CGPointMake(50, 100)
+                                                     beaconB:CGPointMake(100, 100)
+                                                     beaconC:CGPointMake(150, 100)
+                                                   distanceA:111.80
+                                                   distanceB:100
+                                                   distanceC:111.80];
+    
+    
+    TRC_NRM(@"%f %f", currentLocation.x, currentLocation.y);
+    
     // TODO: Loading/Drawing Pre-Existing Layout
     
     if (_objStore.racks.count > 0)
@@ -52,49 +70,16 @@
             isWalkingPath = NO;
             isBeacon = NO;
             
+            
             Racks *rack = [_objStore.racks objectAtIndex:i];
             
-            if ([rack.rackType isEqualToString:@"6"])
-            {
-                
-                CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
-                CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
-                
-                if (X == 0.00)
-                {
-                    Y = Y - HALF(ENTRY_EXIT_HEIGHT);
-                }
-                else if (Y == 0.00)
-                {
-                    X = X - HALF(ENTRY_EXIT_WIDTH);
-                }
-                else if (X == _imgBackground.frame.size.width)
-                {
-                    X = X - ENTRY_EXIT_WIDTH;
-                    Y = Y - HALF(ENTRY_EXIT_HEIGHT);
-                }
-                else if (Y == _imgBackground.frame.size.height)
-                {
-                    X = X - HALF(ENTRY_EXIT_WIDTH);
-                    Y = Y - ENTRY_EXIT_HEIGHT;
-                }
-                
-                CGFloat width = ENTRY_EXIT_WIDTH;
-                CGFloat height = ENTRY_EXIT_HEIGHT;
-                
-                [self addEntryPointForX:X
-                                   andY:Y
-                               forWidth:width
-                              andHeight:height];
-                
-            }
+            CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
+            CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
+            CGFloat width = [self convertSquareFeetToPixelsForHorizontalValue:[rack.rackWidth floatValue]];
+            CGFloat height = [self convertSquareFeetToPixelsForVerticalValue:[rack.rackHeight floatValue]];
             
-            else if ([rack.rackType isEqualToString:@"7"])
+            if ([rack.rackType isEqualToString:@"6"] || [rack.rackType isEqualToString:@"7"])
             {
-                
-                CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
-                CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
-                
                 if (X == 0.00)
                 {
                     Y = Y - HALF(ENTRY_EXIT_HEIGHT);
@@ -114,14 +99,16 @@
                     Y = Y - ENTRY_EXIT_HEIGHT;
                 }
                 
-                CGFloat width = ENTRY_EXIT_WIDTH;
-                CGFloat height = ENTRY_EXIT_HEIGHT;
+                width = ENTRY_EXIT_WIDTH;
+                height = ENTRY_EXIT_HEIGHT;
                 
-                [self addExitPointForX:X
-                                  andY:Y
-                              forWidth:width
-                             andHeight:height];
-                
+                [rack.rackType isEqualToString:@"6"] ? [self addEntryPointForX:X
+                                                                          andY:Y
+                                                                      forWidth:width
+                                                                     andHeight:height] : [self addExitPointForX:X
+                                                                                                           andY:Y
+                                                                                                       forWidth:width
+                                                                                                      andHeight:height];
             }
             else
             {
@@ -136,11 +123,6 @@
                 }
                 
                 shapeLayer = isBeacon ? [self initializeBeaconLayer] : [self initializeShapeLayerWithID:rack.rackType];
-                
-                CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
-                CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
-                CGFloat width = [self convertSquareFeetToPixelsForHorizontalValue:[rack.rackWidth floatValue]];
-                CGFloat height = [self convertSquareFeetToPixelsForVerticalValue:[rack.rackHeight floatValue]];
                 
                 if (isBeacon)
                 {
@@ -164,6 +146,27 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
+}
+
+- (CGPoint)getCoordinateWithBeaconA:(CGPoint)a
+                            beaconB:(CGPoint)b
+                            beaconC:(CGPoint)c
+                          distanceA:(CGFloat)dA
+                          distanceB:(CGFloat)dB
+                          distanceC:(CGFloat)dC
+{
+    CGFloat W, Z, x, y, y2;
+    
+    W = dA*dA - dB*dB - a.x*a.x - a.y*a.y + b.x*b.x + b.y*b.y;
+    Z = dB*dB - dC*dC - b.x*b.x - b.y*b.y + c.x*c.x + c.y*c.y;
+    
+    x = (W*(c.y-b.y) - Z*(b.y-a.y)) / (2 * ((b.x-a.x)*(c.y-b.y) - (c.x-b.x)*(b.y-a.y)));
+    y = (W - 2*x*(b.x-a.x)) / (2*(b.y-a.y));
+    //y2 is a second measure of y to mitigate errors
+    y2 = (Z - 2*x*(c.x-b.x)) / (2*(c.y-b.y));
+    
+    y = (y + y2) / 2;
+    return CGPointMake(x, y);
 }
 
 #pragma mark - Initializations
@@ -272,6 +275,11 @@
 
 - (IBAction)btnShoppingListClicked:(id)sender
 {
+    [DefaultsValues setIntegerValueToUserDefaults:1 ForKey:KEY_SELECTED_MENU];
+    
+    MenuVC *menuVC = (MenuVC *)self.mm_drawerController.leftDrawerViewController;
+    [menuVC.tblMenu reloadData];
+    
     [self.navigationController pushViewController:STORYBOARD_ID(@"idShoppingListVC") animated:YES];
 }
 
