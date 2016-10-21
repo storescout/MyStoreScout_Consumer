@@ -42,6 +42,15 @@
 
 - (void)setLayout
 {
+    if (SCREEN_HEIGHT > 568)
+    {
+        _txtusername.font = THEME_FONT(18);
+        _txtPassword.font = THEME_FONT(18);
+        _btnLogin.titleLabel.font = THEME_FONT(19);
+        _btnForgotPassword.titleLabel.font = THEME_FONT(19);
+        _btnSignUp.titleLabel.font = THEME_FONT(18);
+    }
+    
     [[BaseVC sharedInstance] addLeftPaddingForTextFields:@[_txtusername, _txtPassword]];
     
     [[BaseVC sharedInstance] addCustomPlaceHolderToTextField:_txtusername

@@ -31,19 +31,40 @@
     
     [self setLayout];
     [self configureMap];
-    [self getAllStores];
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
     [self.locationManager startUpdatingLocation];
+    [self getAllStores];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
     [self.locationManager stopUpdatingLocation];
+    
+}
+
+- (void)applyMapViewMemoryFix
+{    
+    switch (_mapView.mapType)
+    {
+        case MKMapTypeHybrid:
+        {
+            _mapView.mapType = MKMapTypeStandard;
+        }
+        break;
+            
+        case MKMapTypeStandard:
+        {
+            _mapView.mapType = MKMapTypeHybrid;
+        }
+        break;
+            
+        default:
+            break;
+    }
+    _mapView.showsUserLocation = NO;
+    _mapView.delegate = nil;
+//    [_mapView removeFromSuperview];
+    _mapView = nil;
 }
 
 - (void)didReceiveMemoryWarning
@@ -202,7 +223,9 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return arrTempStores.count;
+    return [[BaseVC sharedInstance] getRowsforTable:tableView
+                                           forArray:(NSMutableArray *)arrTempStores
+                                    withPlaceHolder:@"No Result Found"];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

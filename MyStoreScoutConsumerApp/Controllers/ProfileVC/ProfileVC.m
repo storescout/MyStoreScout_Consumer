@@ -56,6 +56,15 @@
                                                  withPlaceHolder:@"Enter New Password"];
         [[BaseVC sharedInstance] addCustomPlaceHolderToTextField:_txtConfirmPassword
                                                  withPlaceHolder:@"Confirm Password"];
+        
+        self.scrollView.contentSize = CGSizeMake(SCREEN_WIDTH, _vwChangePasswordContainer.frame.origin.y + _vwChangePasswordContainer.frame.size.height);
+        
+        _vwOfScrollViewHeight.constant = _vwChangePasswordContainer.frame.origin.y + _vwChangePasswordContainer.frame.size.height;
+        
+        [self.view layoutIfNeeded];
+        
+        [self.scrollView setContentOffset:CGPointZero animated:YES];
+        [self.scrollView setScrollEnabled:NO];
     });
     [self tapGestureInitialize];
     [self integrateNextButtonToolBar];
@@ -280,21 +289,35 @@
     return YES;
 }
 
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    return YES;
+}
+
 #pragma mark - Button Click Events
 
 - (IBAction)btnEditClicked:(id)sender
 {
     [self.view endEditing:YES];
+    
+    dispatch_async(dispatch_get_main_queue(), ^
+    {
+        [self.scrollView setContentOffset:CGPointZero animated:YES];
+    });
+    
     [UIView transitionWithView:_vwChangePasswordContainer
                       duration:0.4
                        options:UIViewAnimationOptionTransitionFlipFromLeft
                     animations:^{
-                        _vwChangePasswordContainer.hidden = !_vwChangePasswordContainer.hidden;
-                        _txtUserName.enabled = !_txtUserName.enabled;
-                        _txtEmailAddress.enabled = !_txtEmailAddress.enabled;
-                        _txtMobileNumber.enabled = !_txtMobileNumber.enabled;
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            _vwChangePasswordContainer.hidden = !_vwChangePasswordContainer.hidden;
+                            _txtUserName.enabled = !_txtUserName.enabled;
+                            _txtEmailAddress.enabled = !_txtEmailAddress.enabled;
+                            _txtMobileNumber.enabled = !_txtMobileNumber.enabled;
+                            _scrollView.scrollEnabled = !_scrollView.scrollEnabled;
+                        });
                     }
-                    completion:NULL];
+                    completion:nil];
 }
 
 - (IBAction)btnBackClicked:(id)sender

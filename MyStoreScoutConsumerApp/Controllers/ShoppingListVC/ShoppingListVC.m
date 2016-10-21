@@ -37,6 +37,14 @@
         
         [[BaseVC sharedInstance] addCustomPlaceHolderToTextField:_txtAddItem
                                                  withPlaceHolder:@"Add item name"];
+        
+        if (SCREEN_HEIGHT > 568)
+        {
+            _lblAddItem.font = THEME_FONT(25);
+            _txtAddItem.font = THEME_FONT(18);
+            _btnSave.titleLabel.font = THEME_FONT(20);
+            _btnCancel.titleLabel.font = THEME_FONT(20);
+        }
     });
     
     [self getAllShoppingListItems];

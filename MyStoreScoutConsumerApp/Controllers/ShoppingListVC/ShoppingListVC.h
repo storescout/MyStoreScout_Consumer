@@ -22,6 +22,7 @@
 @property (strong, nonatomic) IBOutlet UIView *vwAddItem;
 @property (strong, nonatomic) IBOutlet UIView *vwAddItemContainer;
 @property (strong, nonatomic) IBOutlet UITableView *tblResults;
+@property (weak, nonatomic) IBOutlet UILabel *lblAddItem;
 
 - (IBAction)btnOptionsClicked:(id)sender;
 - (IBAction)btnBackClicked:(id)sender;

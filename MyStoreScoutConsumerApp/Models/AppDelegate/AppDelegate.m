@@ -35,11 +35,11 @@
         [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
         [[UIApplication sharedApplication] registerForRemoteNotifications];
     }
-    else
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
-         (UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert)];
-    
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+//    else
+//        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
+//         (UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert)];
+//    
+//    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     
     [self setRootViewControllerForUserLoggedIn:[DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID] == 0 ? NO : YES];
     

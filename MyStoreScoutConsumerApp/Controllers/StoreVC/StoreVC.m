@@ -51,15 +51,15 @@
 //                                                   distanceB:250
 //                                                   distanceC:100];
     
-    CGPoint currentLocation = [self getCoordinateWithBeaconA:CGPointMake(50, 100)
-                                                     beaconB:CGPointMake(100, 100)
-                                                     beaconC:CGPointMake(150, 100)
-                                                   distanceA:111.80
-                                                   distanceB:100
-                                                   distanceC:111.80];
+//    CGPoint currentLocation = [self getCoordinateWithBeaconA:CGPointMake(50, 100)
+//                                                     beaconB:CGPointMake(100, 100)
+//                                                     beaconC:CGPointMake(150, 100)
+//                                                   distanceA:111.80
+//                                                   distanceB:100
+//                                                   distanceC:111.80];
     
     
-    TRC_NRM(@"%f %f", currentLocation.x, currentLocation.y);
+//    TRC_NRM(@"%f %f", currentLocation.x, currentLocation.y);
     
     // TODO: Loading/Drawing Pre-Existing Layout
     

@@ -47,6 +47,15 @@
 
 - (void)setLayout
 {
+    if (SCREEN_HEIGHT > 568)
+    {
+        _txtUsername.font = THEME_FONT(18);
+        _txtEmailAddress.font = THEME_FONT(18);
+        _txtMobileNumber.font = THEME_FONT(18);
+        _txtPassword.font = THEME_FONT(18);
+        _btnSignUp.titleLabel.font = THEME_FONT(19);
+    }
+    
     [[BaseVC sharedInstance] addBottomLineToTextFields:@[_txtUsername, _txtEmailAddress, _txtMobileNumber, _txtPassword]];
     
     [[BaseVC sharedInstance] addCustomPlaceHolderToTextField:_txtUsername
