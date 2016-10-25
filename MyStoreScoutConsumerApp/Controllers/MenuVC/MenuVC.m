@@ -48,11 +48,16 @@
     
     _lblFullName.text = [NSString stringWithFormat:@"%@ %@",objUser.firstName, objUser.lastName];
     
-    NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
+    if (![objUser.profilePic isEqualToString:@"default.jpg"]) {
     
-    [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
-                          placeholderImage:[UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]
-                                   options:SDWebImageRefreshCached];
+        NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
+        
+        [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
+                              placeholderImage:[UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]];
+    }
+    else{
+        _imgProfilePicture.image = [UIImage imageNamed:@"IMG_DEFAULT_PROFILE"];
+    }
 }
 
 - (void)didReceiveMemoryWarning

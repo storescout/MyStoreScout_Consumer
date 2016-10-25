@@ -8,12 +8,16 @@
 
 #import "ProfileVC.h"
 
+#define DEFAULT_IMAGE_NAME @"default.jpg"
+
 @interface ProfileVC ()
 {
     BOOL isImageSet;
-    UIImagePickerController *imagePickerController;
+    BOOL isImageChanged;
+    
     NSString *strBase64;
-    UIImage *tempImage;
+    UIImage *tempImage, *mainImage;
+    UIImagePickerController *imagePickerController;
 }
 @end
 
@@ -24,10 +28,10 @@
     [super viewDidLoad];
     
     strBase64 = @"";
-    
+    isImageChanged = NO;
     tempImage = [UIImage imageNamed:@"IMG_DEFAULT_PROFILE"];
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.00001 * NSEC_PER_SEC), dispatch_get_main_queue(),^
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.00001 * NSEC_PER_SEC), dispatch_get_main_queue(), ^
     {
         _imgProfilePicture.layer.cornerRadius = _imgProfilePicture.frame.size.width / 2;
         _imgProfilePicture.clipsToBounds = YES;
@@ -57,15 +61,18 @@
         [[BaseVC sharedInstance] addCustomPlaceHolderToTextField:_txtConfirmPassword
                                                  withPlaceHolder:@"Confirm Password"];
         
-        self.scrollView.contentSize = CGSizeMake(SCREEN_WIDTH, _vwChangePasswordContainer.frame.origin.y + _vwChangePasswordContainer.frame.size.height);
+        CGFloat heightScrollView = _vwChangePasswordContainer.frame.origin.y + _vwChangePasswordContainer.frame.size.height;
         
-        _vwOfScrollViewHeight.constant = _vwChangePasswordContainer.frame.origin.y + _vwChangePasswordContainer.frame.size.height;
+        self.scrollView.contentSize = CGSizeMake(SCREEN_WIDTH, heightScrollView);
+        
+        _vwOfScrollViewHeight.constant = heightScrollView;
         
         [self.view layoutIfNeeded];
         
         [self.scrollView setContentOffset:CGPointZero animated:YES];
         [self.scrollView setScrollEnabled:NO];
     });
+    
     [self tapGestureInitialize];
     [self integrateNextButtonToolBar];
     
@@ -75,22 +82,37 @@
     _txtEmailAddress.text = objUser.email;
     _txtMobileNumber.text = objUser.contactNo;
     
-    if (![objUser.profilePic isEqualToString:@"default.jpg"])
+    if (![objUser.profilePic isEqualToString:DEFAULT_IMAGE_NAME])
     {
         isImageSet = YES;
     }
     
-    NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
-    
-    [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
-                          placeholderImage:[UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]];
+    if (![objUser.profilePic isEqualToString:DEFAULT_IMAGE_NAME])
+    {
+        NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
+        
+        [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
+                              placeholderImage:[UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]
+                                     completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                                         mainImage = image;
+                                     }];
+    }
+    else
+    {
+        _imgProfilePicture.image = [UIImage imageNamed:@"IMG_DEFAULT_PROFILE"];
+        mainImage = [UIImage imageNamed:@"IMG_DEFAULT_PROFILE"];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
-    [self setNeedsStatusBarAppearanceUpdate];
+    
+    if (!([UIApplication sharedApplication].statusBarStyle == UIStatusBarStyleLightContent))
+    {
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+        [self setNeedsStatusBarAppearanceUpdate];
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -100,7 +122,11 @@
 
 - (void)tapGestureInitialize
 {
-    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGesture:)];
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] init];
+    
+    [tapGesture addTarget:self
+                   action:@selector(tapGesture:)];
+    
     tapGesture.numberOfTapsRequired = 1;
     [tapGesture setDelegate:self];
     [_imgProfilePicture addGestureRecognizer:tapGesture];
@@ -108,6 +134,9 @@
 
 - (void)tapGesture:(id)sender
 {
+    [self.view endEditing:YES];
+    
+    
     if(!_vwChangePasswordContainer.hidden)
     {
         BOOL isDefaultImage = isImageSet ? NO : YES;
@@ -126,8 +155,6 @@
 {
     if ((buttonIndex == 0 && actionSheet.tag == 0) || (buttonIndex == 1 && actionSheet.tag == 1))
     {
-        [self.view endEditing:YES];
-        
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
         {
             imagePickerController= [[UIImagePickerController alloc] init];
@@ -148,7 +175,6 @@
     }
     else if ((buttonIndex == 1 && actionSheet.tag == 0) || (buttonIndex == 2 && actionSheet.tag == 1))
     {
-        [self.view endEditing:YES];
         imagePickerController = [[UIImagePickerController alloc] init];
         imagePickerController.delegate = self;
         imagePickerController.sourceType =  UIImagePickerControllerSourceTypePhotoLibrary;
@@ -158,10 +184,12 @@
     {
         isImageSet = NO;
         strBase64 = @"";
+        isImageChanged = YES;
+        
         [UIView transitionWithView:_vwImageContainer
                           duration:0.4
                            options:UIViewAnimationOptionTransitionFlipFromLeft
-                        animations:^{
+                        animations:^ {
                             [_imgProfilePicture setImage:DEFAULT_PROFILE_IMAGE];
                         } completion:nil];
 
@@ -173,6 +201,7 @@
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)dict
 {
     isImageSet = YES;
+    isImageChanged = YES;
     
     if ([dict objectForKey:UIImagePickerControllerOriginalImage])
     {
@@ -191,11 +220,11 @@
                                 _imgProfilePicture.image = finalImage;
                             } completion:nil];
         }];
+        
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
         {
             strBase64 = [[BaseVC sharedInstance] encodeToBase64String:finalImage];
         });
-
     }
     else if ([dict objectForKey:UIImagePickerControllerEditedImage])
     {
@@ -224,7 +253,7 @@
 }
 
 - (void)navigationController:(UINavigationController *)navigationController
-      willShowViewController:(UIViewController *)viewController
+       didShowViewController:(UIViewController *)viewController
                     animated:(BOOL)animated
 {
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
@@ -309,7 +338,26 @@
                       duration:0.4
                        options:UIViewAnimationOptionTransitionFlipFromLeft
                     animations:^{
-                        dispatch_async(dispatch_get_main_queue(), ^{
+                        dispatch_async(dispatch_get_main_queue(), ^
+                        {
+                            if(!_vwChangePasswordContainer.hidden)
+                            {
+                                strBase64 = @"";
+                                isImageChanged = NO;
+                                if (mainImage != nil)
+                                {
+                                    if (![[BaseVC sharedInstance] image:_imgProfilePicture.image isEqualTo:mainImage])
+                                    {
+                                        [UIView transitionWithView:_vwImageContainer
+                                                          duration:0.4
+                                                           options:UIViewAnimationOptionTransitionFlipFromLeft
+                                                        animations:^{
+                                                                isImageSet = [[BaseVC sharedInstance] image:mainImage isEqualTo:[UIImage imageNamed:DEFAULT_IMAGE_NAME]] ? NO : YES;
+                                                            _imgProfilePicture.image = mainImage;
+                                                        } completion:nil];
+                                    }
+                                }
+                            }
                             _vwChangePasswordContainer.hidden = !_vwChangePasswordContainer.hidden;
                             _txtUserName.enabled = !_txtUserName.enabled;
                             _txtEmailAddress.enabled = !_txtEmailAddress.enabled;
@@ -356,6 +404,7 @@
                                                                        @"user_id":[NSString stringWithFormat:@"%ld", user_id],
                                                                        @"role_id":@"1",
                                                                        @"profile_pic":strBase64,
+                                                                       @"is_image_changed":isImageChanged ? @"1" : @"0",
                                                                        @"username":_txtUserName.text,
                                                                        @"email":_txtEmailAddress.text,
                                                                        @"mobile_no":_txtMobileNumber.text,
@@ -408,6 +457,7 @@
                                                            @"user_id":[NSString stringWithFormat:@"%ld", user_id],
                                                            @"role_id":@"1",
                                                            @"profile_pic":strBase64,
+                                                           @"is_image_changed":isImageChanged ? @"1" : @"0",
                                                            @"username":_txtUserName.text,
                                                            @"email":_txtEmailAddress.text,
                                                            @"mobile_no":_txtMobileNumber.text,
@@ -470,22 +520,33 @@
             _txtEmailAddress.text = objUser.email;
             _txtMobileNumber.text = objUser.contactNo;
             
-            if (![objUser.profilePic isEqualToString:@"default.jpg"])
+            if (![objUser.profilePic isEqualToString:DEFAULT_IMAGE_NAME])
             {
                 isImageSet = YES;
             }
             
-//            [SDWebImageManager.sharedManager.imageCache clearMemory];
-//            [SDWebImageManager.sharedManager.imageCache clearDisk];
-            SDImageCache *imageCache = [SDImageCache sharedImageCache];
-            [imageCache clearMemory];
-            [imageCache clearDisk];
+            if (isImageChanged) {
+                
+                mainImage = _imgProfilePicture.image;
+                
+                SDImageCache *imageCache = [SDImageCache sharedImageCache];
+                [imageCache clearMemory];
+                [imageCache clearDisk];
+                
+                if (![objUser.profilePic isEqualToString:DEFAULT_IMAGE_NAME]) {
+                
+                NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
+                
+                [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
+                                      placeholderImage:tempImage
+                                               options:SDWebImageRefreshCached];
+                }
+                else {
+                    _imgProfilePicture.image = [UIImage imageNamed:@"IMG_DEFAULT_PROFILE"];
+                }
+            }
             
-            NSString *strImgPath = [NSString stringWithFormat:@"%sprofile/%@",Image_Path,objUser.profilePic];
-
-            [_imgProfilePicture sd_setImageWithURL:[NSURL URLWithString:strImgPath]
-                                  placeholderImage:tempImage
-                                           options:SDWebImageRefreshCached];
+            [self btnEditClicked:nil];
             
             [AZNotification showNotificationWithTitle:@"Changes has been saved successfully"
                                            controller:self

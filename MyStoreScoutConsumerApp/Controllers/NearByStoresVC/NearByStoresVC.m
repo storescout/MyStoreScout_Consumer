@@ -270,11 +270,22 @@
     {
         if (self.locationManager == nil)
         {
-            self.locationManager = [[CLLocationManager alloc] init];
-            self.locationManager.delegate = self;
-            self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-            self.locationManager.distanceFilter = kCLDistanceFilterNone;
-            [self.locationManager requestAlwaysAuthorization];
+            if (_beaconRegion == nil)
+            {
+                self.locationManager = [[CLLocationManager alloc] init];
+                self.locationManager.delegate = self;
+                self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+                self.locationManager.distanceFilter = kCLDistanceFilterNone;
+                [self.locationManager requestAlwaysAuthorization];
+                
+                NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"8DE29DD6-B667-4A51-B91F-48038B3F5278"];
+                
+                _beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:uuid
+                                                                   identifier:@"com.MyStoreScoutConsumerApp"];
+                
+                [self.locationManager startMonitoringForRegion:_beaconRegion];
+                [self.locationManager startRangingBeaconsInRegion:_beaconRegion];
+            }
         }
     }
 
@@ -308,6 +319,25 @@
                 break;
             }
         }
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager
+         didEnterRegion:(CLRegion *)region
+{
+    
+}
+
+- (void)locationManager:(CLLocationManager *)manager
+        didRangeBeacons:(NSArray *)beacons
+               inRegion:(CLBeaconRegion *)region
+{
+    if (beacons.count > 2)
+    {
+//        CLBeacon *beaconA = [beacons objectAtIndex:0];
+//        CLBeacon *beaconB = [beacons objectAtIndex:1];
+//        CLBeacon *beaconC = [beacons objectAtIndex:2];
+        // caclculate each beacon distance from current location and through which get current location and start navigating
     }
 }
 

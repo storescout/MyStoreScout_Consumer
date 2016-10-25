@@ -17,7 +17,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnMenu;
 @property (weak, nonatomic) IBOutlet UITableView *tblSearchResults;
 
-@property (nonatomic, strong) CLLocationManager *locationManager;
+@property (strong, nonatomic) CLLocationManager *locationManager;
+@property (strong, nonatomic) CLBeaconRegion *beaconRegion;
+@property (strong, nonatomic) CLBeacon *beacon;
 
 - (IBAction)btnMenuClicked:(id)sender;
 

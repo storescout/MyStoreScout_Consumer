@@ -180,7 +180,12 @@
         {
             [self.view endEditing:YES];
         });
-       
+        
+//        runOnBackGroundThread({
+//            NSString *strEmail = ((UITextField *)[alertController.textFields objectAtIndex:0]).text;
+//            [self resetPasswordForEmailID:strEmail];
+//        });
+        
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
         {
             NSString *strEmail = ((UITextField *)[alertController.textFields objectAtIndex:0]).text;

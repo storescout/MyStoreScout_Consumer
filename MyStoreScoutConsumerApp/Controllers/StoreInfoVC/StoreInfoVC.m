@@ -180,7 +180,7 @@
     NSString *strImgPath = [NSString stringWithFormat:@"%s%@",SERVER,objStoreImages.imgPath];
     
     [cell.imgView sd_setImageWithURL:[NSURL URLWithString:strImgPath]
-                         placeholderImage:[UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]];
+                    placeholderImage:[UIImage imageNamed:@"IMG_DEFAULT_PROFILE"]];
     
     return cell;
 }

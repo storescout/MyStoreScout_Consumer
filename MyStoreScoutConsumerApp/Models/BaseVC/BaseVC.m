@@ -25,7 +25,8 @@
 
 /* ----------------------------------------------- */
 
-- (void)addAlertBoxWithText:(NSString *)message toVC:(UIViewController *)VC
+- (void)addAlertBoxWithText:(NSString *)message
+                       toVC:(UIViewController *)VC
 {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:APP_NAME
                                                                     message:message

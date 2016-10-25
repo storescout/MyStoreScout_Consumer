@@ -56,6 +56,8 @@
 
 #define HALF(UNIT) UNIT/2
 
+#define runOnBackGroundThread(...) dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{ __VA_ARGS__ })
+
 #define DEFAULT_STROKE_COLOR [UIColor colorWithRed:255/255.0 green:183/255.0 blue:184/255.0 alpha:1.0]
 #define WALKING_PATH_STROKE_COLOR [UIColor blackColor]
 

@@ -43,24 +43,6 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-//    CGPoint currentLocation = [self getCoordinateWithBeaconA:CGPointMake(50, 50)
-//                                                     beaconB:CGPointMake(300, 200)
-//                                                     beaconC:CGPointMake(50, 300)
-//                                                   distanceA:150
-//                                                   distanceB:250
-//                                                   distanceC:100];
-    
-//    CGPoint currentLocation = [self getCoordinateWithBeaconA:CGPointMake(50, 100)
-//                                                     beaconB:CGPointMake(100, 100)
-//                                                     beaconC:CGPointMake(150, 100)
-//                                                   distanceA:111.80
-//                                                   distanceB:100
-//                                                   distanceC:111.80];
-    
-    
-//    TRC_NRM(@"%f %f", currentLocation.x, currentLocation.y);
-    
     // TODO: Loading/Drawing Pre-Existing Layout
     
     if (_objStore.racks.count > 0)
@@ -167,6 +149,24 @@
     
     y = (y + y2) / 2;
     return CGPointMake(x, y);
+
+//    float xa = a.x;
+//    float ya = a.y;
+//    float xb = b.x;
+//    float yb = b.y;
+//    float xc = c.x;
+//    float yc = c.y;
+//    float ra = dA;
+//    float rb = dB;
+//    float rc = dC;
+//    
+//    float S = (pow(xc, 2.) - pow(xb, 2.) + pow(yc, 2.) - pow(yb, 2.) + pow(rb, 2.) - pow(rc, 2.)) / 2.0;
+//    float T = (pow(xa, 2.) - pow(xb, 2.) + pow(ya, 2.) - pow(yb, 2.) + pow(rb, 2.) - pow(ra, 2.)) / 2.0;
+//    float y = ((T * (xb - xc)) - (S * (xb - xa))) / (((ya - yb) * (xb - xc)) - ((yc - yb) * (xb - xa)));
+//    float x = ((y * (ya - yb)) - T) / (xb - xa);
+//    
+//    CGPoint point = CGPointMake(x, y);
+//    return point;
 }
 
 #pragma mark - Initializations
