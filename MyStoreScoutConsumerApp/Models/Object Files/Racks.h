@@ -1,7 +1,7 @@
 //
 //  Racks.h
 //
-//  Created by C205  on 11/10/16
+//  Created by   on 21/11/16
 //  Copyright (c) 2016 __MyCompanyName__. All rights reserved.
 //
 
@@ -14,6 +14,7 @@
 @property (nonatomic, strong) NSString *racksIdentifier;
 @property (nonatomic, strong) NSString *isDeleted;
 @property (nonatomic, strong) NSString *modified;
+@property (nonatomic, strong) NSString *angle;
 @property (nonatomic, strong) NSString *positionY;
 @property (nonatomic, strong) NSString *rackHeight;
 @property (nonatomic, strong) NSString *created;

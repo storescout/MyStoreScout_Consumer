@@ -29,7 +29,6 @@
         _vwImageContainer.clipsToBounds = YES;
         _vwImageContainer.layer.borderWidth = 2.0f;
         _vwImageContainer.layer.borderColor = [UIColor whiteColor].CGColor;
-
     });
     
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
@@ -95,7 +94,7 @@
     }
     
     [APP_CONTEXT.drawerController setCenterViewController:navigation
-                                       withCloseAnimation:YES
+                                        withCloseAnimation:YES
                                                completion:nil];
 }
 
@@ -117,9 +116,8 @@
     else
     {
         [DefaultsValues setIntegerValueToUserDefaults:(int)indexPath.row ForKey:KEY_SELECTED_MENU];
-        [tableView reloadData];
         
-//        STORYBOARD_ID(indexPath.row == 0 ? @"idStoresVC" : @"idShoppingListVC");
+        [tableView reloadData];
 
         [self navigateToViewController:STORYBOARD_ID(indexPath.row == 0 ? @"idStoresVC" : @"idShoppingListVC")];
     }

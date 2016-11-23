@@ -10,6 +10,8 @@
 #import "Racks.h"
 #import "MenuVC.h"
 
+#define DEGREES_TO_RADIANS(degrees)((M_PI * degrees)/180)
+
 @interface StoreVC ()
 {
     BOOL isWalkingPath; // check if object is walking path
@@ -28,6 +30,9 @@
     [super viewDidLoad];
     
     _lblTitle.text = _objStore.storeName;
+    
+    _imgBackground.layer.borderColor = [UIColor darkGrayColor].CGColor;
+    _imgBackground.layer.borderWidth = 3.0f;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -47,82 +52,106 @@
     
     if (_objStore.racks.count > 0)
     {
-        for (int i = 0; i < _objStore.racks.count; i++)
-        {
-            isWalkingPath = NO;
-            isBeacon = NO;
+        isWalkingPath = NO;
+        isBeacon = NO;
+        
+        [self drawLayoutForArray:[NSMutableArray arrayWithArray:_objStore.racks]];
             
-            
-            Racks *rack = [_objStore.racks objectAtIndex:i];
-            
-            CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
-            CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
-            CGFloat width = [self convertSquareFeetToPixelsForHorizontalValue:[rack.rackWidth floatValue]];
-            CGFloat height = [self convertSquareFeetToPixelsForVerticalValue:[rack.rackHeight floatValue]];
-            
-            if ([rack.rackType isEqualToString:@"6"] || [rack.rackType isEqualToString:@"7"])
-            {
-                if (X == 0.00)
-                {
-                    Y = Y - HALF(ENTRY_EXIT_HEIGHT);
-                }
-                else if (Y == 0.00)
-                {
-                    X = X - HALF(ENTRY_EXIT_WIDTH);
-                }
-                else if (X == _imgBackground.frame.size.width)
-                {
-                    X = X - ENTRY_EXIT_WIDTH;
-                    Y = Y - HALF(ENTRY_EXIT_HEIGHT);
-                }
-                else if (Y == _imgBackground.frame.size.height)
-                {
-                    X = X - HALF(ENTRY_EXIT_WIDTH);
-                    Y = Y - ENTRY_EXIT_HEIGHT;
-                }
-                
-                width = ENTRY_EXIT_WIDTH;
-                height = ENTRY_EXIT_HEIGHT;
-                
-                [rack.rackType isEqualToString:@"6"] ? [self addEntryPointForX:X
-                                                                          andY:Y
-                                                                      forWidth:width
-                                                                     andHeight:height] : [self addExitPointForX:X
-                                                                                                           andY:Y
-                                                                                                       forWidth:width
-                                                                                                      andHeight:height];
-            }
-            else
-            {
-            
-                if ([rack.rackType isEqualToString:@"2"])
-                {
-                    isWalkingPath = YES;
-                }
-                else if ([rack.rackType isEqualToString:@"4"])
-                {
-                    isBeacon = YES;
-                }
-                
-                shapeLayer = isBeacon ? [self initializeBeaconLayer] : [self initializeShapeLayerWithID:rack.rackType];
-                
-                if (isBeacon)
-                {
-                    X = X - HALF(BEACON_WIDTH);
-                    Y = Y - HALF(BEACON_HEIGHT);
-                    width = BEACON_WIDTH;
-                    height = BEACON_HEIGHT;
-                }
-
-                
-                shapeLayer.path = [self drawRackFromStartingX:X
-                                                         andY:Y
-                                                    withWidth:width
-                                                    andHeight:height].CGPath;
-            }
-        }
         [SVProgressHUD dismiss];
     }
+}
+
+- (void)drawLayoutForArray:(NSMutableArray *)arrTemp
+{
+    for (int i = 0; i < arrTemp.count; i++)
+    {
+        Racks *rack = [arrTemp objectAtIndex:i];
+        
+        // converting values from square feet to pixels
+        CGFloat X = [self convertSquareFeetToPixelsForHorizontalValue:[rack.positionX floatValue]];
+        CGFloat Y = [self convertSquareFeetToPixelsForVerticalValue:[rack.positionY floatValue]];
+        CGFloat width = [self convertSquareFeetToPixelsForHorizontalValue:[rack.rackWidth floatValue]];
+        CGFloat height = [self convertSquareFeetToPixelsForVerticalValue:[rack.rackHeight floatValue]];
+        
+        if ([rack.rackType isEqualToString:@"6"] || [rack.rackType isEqualToString:@"7"])
+        {
+            if (X == 0.00)
+            {
+                Y = Y - HALF(ENTRY_EXIT_HEIGHT);
+            }
+            else if (Y == 0.00)
+            {
+                X = X - HALF(ENTRY_EXIT_WIDTH);
+            }
+            else if (X == _imgBackground.frame.size.width)
+            {
+                X = X - ENTRY_EXIT_WIDTH;
+                Y = Y - HALF(ENTRY_EXIT_HEIGHT);
+            }
+            else if (Y == _imgBackground.frame.size.height)
+            {
+                X = X - HALF(ENTRY_EXIT_WIDTH);
+                Y = Y - ENTRY_EXIT_HEIGHT;
+            }
+            
+            width = ENTRY_EXIT_WIDTH;
+            height = ENTRY_EXIT_HEIGHT;
+            
+            [rack.rackType isEqualToString:@"6"] ? [self addEntryPointForX:X
+                                                                      andY:Y
+                                                                  forWidth:width
+                                                                 andHeight:height] : [self addExitPointForX:X
+                                                                                                       andY:Y
+                                                                                                   forWidth:width
+                                                                                                  andHeight:height];
+        }
+        else
+        {
+            if ([rack.rackType isEqualToString:@"2"]) // check if rack is walking path
+            {
+                isWalkingPath = YES;
+            }
+            else if ([rack.rackType isEqualToString:@"4"])
+            {
+                isBeacon = YES;
+            }
+            
+            shapeLayer = isBeacon ? [self initializeBeaconLayer] : [self initializeShapeLayerWithID:rack.rackType];
+            
+            X = X - HALF(width);
+            Y = Y - HALF(height);
+            width = width;
+            height = height;
+            
+            shapeLayer.path = [self drawRackFromStartingX:X
+                                                     andY:Y
+                                                withWidth:width
+                                                andHeight:height].CGPath;
+            
+            CGPathRef path = createPathRotatedAroundBoundingBoxCenter(shapeLayer.path, DEGREES_TO_RADIANS([rack.angle floatValue]));
+            shapeLayer.path  = path;
+            CGPathRelease(path);
+        }
+        isWalkingPath = NO;
+        isBeacon = NO;
+        
+        [arrTemp removeObjectAtIndex:0];
+        
+        if (arrTemp.count != 0) {
+            [self drawLayoutForArray:arrTemp];
+        }
+    }
+}
+
+static CGPathRef createPathRotatedAroundBoundingBoxCenter(CGPathRef path, CGFloat radians) // used to get path for rack at certain radians
+{
+    CGRect bounds = CGPathGetBoundingBox(path);
+    CGPoint center = CGPointMake(CGRectGetMidX(bounds), CGRectGetMidY(bounds));
+    CGAffineTransform transform = CGAffineTransformIdentity;
+    transform = CGAffineTransformTranslate(transform, center.x, center.y);
+    transform = CGAffineTransformRotate(transform, radians);
+    transform = CGAffineTransformTranslate(transform, -center.x, -center.y);
+    return CGPathCreateCopyByTransformingPath(path, &transform);
 }
 
 - (void)didReceiveMemoryWarning

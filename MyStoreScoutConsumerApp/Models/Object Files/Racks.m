@@ -1,7 +1,7 @@
 //
 //  Racks.m
 //
-//  Created by C205  on 11/10/16
+//  Created by   on 21/11/16
 //  Copyright (c) 2016 __MyCompanyName__. All rights reserved.
 //
 
@@ -11,6 +11,7 @@
 NSString *const kRacksId = @"id";
 NSString *const kRacksIsDeleted = @"is_deleted";
 NSString *const kRacksModified = @"modified";
+NSString *const kRacksAngle = @"angle";
 NSString *const kRacksPositionY = @"position_y";
 NSString *const kRacksRackHeight = @"rack_height";
 NSString *const kRacksCreated = @"created";
@@ -33,6 +34,7 @@ NSString *const kRacksRackType = @"rack_type";
 @synthesize racksIdentifier = _racksIdentifier;
 @synthesize isDeleted = _isDeleted;
 @synthesize modified = _modified;
+@synthesize angle = _angle;
 @synthesize positionY = _positionY;
 @synthesize rackHeight = _rackHeight;
 @synthesize created = _created;
@@ -57,19 +59,20 @@ NSString *const kRacksRackType = @"rack_type";
     // This check serves to make sure that a non-NSDictionary object
     // passed into the model class doesn't break the parsing.
     if(self && [dict isKindOfClass:[NSDictionary class]]) {
-            self.racksIdentifier = [self objectOrNilForKey:kRacksId fromDictionary:dict];
-            self.isDeleted = [self objectOrNilForKey:kRacksIsDeleted fromDictionary:dict];
-            self.modified = [self objectOrNilForKey:kRacksModified fromDictionary:dict];
-            self.positionY = [self objectOrNilForKey:kRacksPositionY fromDictionary:dict];
-            self.rackHeight = [self objectOrNilForKey:kRacksRackHeight fromDictionary:dict];
-            self.created = [self objectOrNilForKey:kRacksCreated fromDictionary:dict];
-            self.rackWidth = [self objectOrNilForKey:kRacksRackWidth fromDictionary:dict];
-            self.isTestdata = [self objectOrNilForKey:kRacksIsTestdata fromDictionary:dict];
-            self.retailUserId = [self objectOrNilForKey:kRacksRetailUserId fromDictionary:dict];
-            self.positionX = [self objectOrNilForKey:kRacksPositionX fromDictionary:dict];
-            self.storeId = [self objectOrNilForKey:kRacksStoreId fromDictionary:dict];
-            self.rackType = [self objectOrNilForKey:kRacksRackType fromDictionary:dict];
-
+        self.racksIdentifier = [self objectOrNilForKey:kRacksId fromDictionary:dict];
+        self.isDeleted = [self objectOrNilForKey:kRacksIsDeleted fromDictionary:dict];
+        self.modified = [self objectOrNilForKey:kRacksModified fromDictionary:dict];
+        self.angle = [self objectOrNilForKey:kRacksAngle fromDictionary:dict];
+        self.positionY = [self objectOrNilForKey:kRacksPositionY fromDictionary:dict];
+        self.rackHeight = [self objectOrNilForKey:kRacksRackHeight fromDictionary:dict];
+        self.created = [self objectOrNilForKey:kRacksCreated fromDictionary:dict];
+        self.rackWidth = [self objectOrNilForKey:kRacksRackWidth fromDictionary:dict];
+        self.isTestdata = [self objectOrNilForKey:kRacksIsTestdata fromDictionary:dict];
+        self.retailUserId = [self objectOrNilForKey:kRacksRetailUserId fromDictionary:dict];
+        self.positionX = [self objectOrNilForKey:kRacksPositionX fromDictionary:dict];
+        self.storeId = [self objectOrNilForKey:kRacksStoreId fromDictionary:dict];
+        self.rackType = [self objectOrNilForKey:kRacksRackType fromDictionary:dict];
+        
     }
     
     return self;
@@ -82,6 +85,7 @@ NSString *const kRacksRackType = @"rack_type";
     [mutableDict setValue:self.racksIdentifier forKey:kRacksId];
     [mutableDict setValue:self.isDeleted forKey:kRacksIsDeleted];
     [mutableDict setValue:self.modified forKey:kRacksModified];
+    [mutableDict setValue:self.angle forKey:kRacksAngle];
     [mutableDict setValue:self.positionY forKey:kRacksPositionY];
     [mutableDict setValue:self.rackHeight forKey:kRacksRackHeight];
     [mutableDict setValue:self.created forKey:kRacksCreated];
@@ -91,11 +95,11 @@ NSString *const kRacksRackType = @"rack_type";
     [mutableDict setValue:self.positionX forKey:kRacksPositionX];
     [mutableDict setValue:self.storeId forKey:kRacksStoreId];
     [mutableDict setValue:self.rackType forKey:kRacksRackType];
-
+    
     return [NSDictionary dictionaryWithDictionary:mutableDict];
 }
 
-- (NSString *)description 
+- (NSString *)description
 {
     return [NSString stringWithFormat:@"%@", [self dictionaryRepresentation]];
 }
@@ -113,10 +117,11 @@ NSString *const kRacksRackType = @"rack_type";
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
     self = [super init];
-
+    
     self.racksIdentifier = [aDecoder decodeObjectForKey:kRacksId];
     self.isDeleted = [aDecoder decodeObjectForKey:kRacksIsDeleted];
     self.modified = [aDecoder decodeObjectForKey:kRacksModified];
+    self.angle = [aDecoder decodeObjectForKey:kRacksAngle];
     self.positionY = [aDecoder decodeObjectForKey:kRacksPositionY];
     self.rackHeight = [aDecoder decodeObjectForKey:kRacksRackHeight];
     self.created = [aDecoder decodeObjectForKey:kRacksCreated];
@@ -131,10 +136,11 @@ NSString *const kRacksRackType = @"rack_type";
 
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
-
+    
     [aCoder encodeObject:_racksIdentifier forKey:kRacksId];
     [aCoder encodeObject:_isDeleted forKey:kRacksIsDeleted];
     [aCoder encodeObject:_modified forKey:kRacksModified];
+    [aCoder encodeObject:_angle forKey:kRacksAngle];
     [aCoder encodeObject:_positionY forKey:kRacksPositionY];
     [aCoder encodeObject:_rackHeight forKey:kRacksRackHeight];
     [aCoder encodeObject:_created forKey:kRacksCreated];
