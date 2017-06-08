@@ -7,15 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
 #import <UserNotifications/UserNotifications.h>
 #import "MMDrawerController.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, UNUserNotificationCenterDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate, UNUserNotificationCenterDelegate, CLLocationManagerDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) MMDrawerController *drawerController;
 
 @property (strong, nonatomic) UIImage *imgUserProfile;
+
+@property (strong, nonatomic) CLLocationManager *locationManager;
 
 - (void)setRootViewControllerForUserLoggedIn:(BOOL)isLoggedin;
 

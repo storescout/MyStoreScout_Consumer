@@ -18,6 +18,7 @@
 
 - (void) drawRect:(CGRect)rect
 {
+    
     CGRect textRect = self.titleLabel.frame;
     
     // need to put the line at top of descenders (negative value)
@@ -35,6 +36,7 @@
     CGContextClosePath(contextRef);
     
     CGContextDrawPath(contextRef, kCGPathStroke);
+        
 }
 
 @end

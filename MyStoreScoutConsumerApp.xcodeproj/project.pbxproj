@@ -391,6 +391,7 @@
 		E4D016D01DA3BBB40007524D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				E4D016D11DA3BBB40007524D /* AppDelegate */,
 				E4D016DD1DA3BC870007524D /* AZNotification */,
 				E4D016E41DA3BC870007524D /* BaseVC */,
 				E4D016E81DA3BC870007524D /* Extensions */,
@@ -405,7 +406,6 @@
 				E4D0173D1DA3BC870007524D /* TPKeyboardAvoiding */,
 				E4D017461DA3BC870007524D /* UserDefaults */,
 				E4D017491DA3BC870007524D /* WebServices */,
-				E4D016D11DA3BBB40007524D /* AppDelegate */,
 				E4D016E71DA3BC870007524D /* CNTrace.h */,
 			);
 			path = Models;
@@ -689,6 +689,11 @@
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = 4A32MKFG9X;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -868,8 +873,8 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Tom Wilson (P2B29LH37C)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tom Wilson (P2B29LH37C)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 4A32MKFG9X;
@@ -892,7 +897,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PROVISIONING_PROFILE = "3bb17db8-1444-463e-bf10-d1bd0892783c";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -918,8 +923,8 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Tom Wilson (P2B29LH37C)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tom Wilson (P2B29LH37C)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 4A32MKFG9X;
@@ -935,7 +940,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PROVISIONING_PROFILE = "3bb17db8-1444-463e-bf10-d1bd0892783c";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -946,15 +951,15 @@
 			baseConfigurationReference = 3DC059275D65588637FEA1FF /* Pods-MyStoreScoutConsumerApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Tom Wilson (P2B29LH37C)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4A32MKFG9X;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MyStoreScoutConsumerApp/MyStoreScoutConsumerApp-Prefix.pch";
 				INFOPLIST_FILE = MyStoreScoutConsumerApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.MyStoreScoutConsumerApp;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.-MyStoreScoutConsumerApp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -967,15 +972,15 @@
 			baseConfigurationReference = 5074D9F999ECAB45118F87E1 /* Pods-MyStoreScoutConsumerApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Tom Wilson (P2B29LH37C)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4A32MKFG9X;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MyStoreScoutConsumerApp/MyStoreScoutConsumerApp-Prefix.pch";
 				INFOPLIST_FILE = MyStoreScoutConsumerApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.MyStoreScoutConsumerApp;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.-MyStoreScoutConsumerApp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";

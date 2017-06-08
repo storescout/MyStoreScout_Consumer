@@ -21,6 +21,7 @@ NSString *const kRacksRetailUserId = @"retail_user_id";
 NSString *const kRacksPositionX = @"position_x";
 NSString *const kRacksStoreId = @"store_id";
 NSString *const kRacksRackType = @"rack_type";
+NSString *const kStoreStoreText = @"store_text";
 
 
 @interface Racks ()
@@ -44,6 +45,7 @@ NSString *const kRacksRackType = @"rack_type";
 @synthesize positionX = _positionX;
 @synthesize storeId = _storeId;
 @synthesize rackType = _rackType;
+@synthesize storeText = _storeText;
 
 
 + (Racks *)modelObjectWithDictionary:(NSDictionary *)dict
@@ -72,7 +74,8 @@ NSString *const kRacksRackType = @"rack_type";
         self.positionX = [self objectOrNilForKey:kRacksPositionX fromDictionary:dict];
         self.storeId = [self objectOrNilForKey:kRacksStoreId fromDictionary:dict];
         self.rackType = [self objectOrNilForKey:kRacksRackType fromDictionary:dict];
-        
+        self.storeText = [self objectOrNilForKey:kStoreStoreText fromDictionary:dict];
+
     }
     
     return self;
@@ -95,7 +98,8 @@ NSString *const kRacksRackType = @"rack_type";
     [mutableDict setValue:self.positionX forKey:kRacksPositionX];
     [mutableDict setValue:self.storeId forKey:kRacksStoreId];
     [mutableDict setValue:self.rackType forKey:kRacksRackType];
-    
+    [mutableDict setValue:self.storeText forKey:kStoreStoreText];
+
     return [NSDictionary dictionaryWithDictionary:mutableDict];
 }
 
@@ -131,6 +135,7 @@ NSString *const kRacksRackType = @"rack_type";
     self.positionX = [aDecoder decodeObjectForKey:kRacksPositionX];
     self.storeId = [aDecoder decodeObjectForKey:kRacksStoreId];
     self.rackType = [aDecoder decodeObjectForKey:kRacksRackType];
+    self.storeText = [aDecoder decodeObjectForKey:kStoreStoreText];
     return self;
 }
 
@@ -150,6 +155,7 @@ NSString *const kRacksRackType = @"rack_type";
     [aCoder encodeObject:_positionX forKey:kRacksPositionX];
     [aCoder encodeObject:_storeId forKey:kRacksStoreId];
     [aCoder encodeObject:_rackType forKey:kRacksRackType];
+    [aCoder encodeObject:_storeText forKey:kStoreStoreText];
 }
 
 

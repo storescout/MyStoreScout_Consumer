@@ -17,6 +17,7 @@
     BOOL isWalkingPath; // check if object is walking path
     BOOL isBeacon; // check if object is beacon
 
+    UILabel *lblText;
     UIImageView *imgEntry;
     UIImageView *imgExit;
     CAShapeLayer *shapeLayer; // all the object initiator
@@ -33,6 +34,44 @@
     
     _imgBackground.layer.borderColor = [UIColor darkGrayColor].CGColor;
     _imgBackground.layer.borderWidth = 3.0f;
+    
+    
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    self.locationManager.distanceFilter = kCLDistanceFilterNone;
+    
+//    [self.locationManager requestWhenInUseAuthorization];
+    [self.locationManager requestAlwaysAuthorization];
+    
+    self.locationManager.allowsBackgroundLocationUpdates = YES;
+    
+    [self.locationManager startUpdatingLocation];
+    
+    NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"fda50693-a4e2-4fb1-afcf-c6eb07647825"];
+    
+    CLBeaconRegion *region1 = [[CLBeaconRegion alloc] initWithProximityUUID:uuid
+                                                                      major:10035
+                                                                      minor:56498
+                                                                 identifier:@"a"];
+    region1.notifyOnEntry = YES;
+    region1.notifyOnExit = YES;
+    region1.notifyEntryStateOnDisplay = YES;
+    
+//    CLBeaconRegion *region2 = [[CLBeaconRegion alloc] initWithProximityUUID:uuid
+//                                                                      major:23
+//                                                                      minor:22
+//                                                                 identifier:@"ab"];
+//    region2.notifyOnEntry = YES;
+//    region2.notifyOnExit = YES;
+//    region2.notifyEntryStateOnDisplay = YES;
+    
+    [self.locationManager startMonitoringForRegion:region1];
+    [self.locationManager startRangingBeaconsInRegion:region1];
+    
+//    [self.locationManager startMonitoringForRegion:region2];
+//    [self.locationManager startRangingBeaconsInRegion:region2];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -60,6 +99,25 @@
         [SVProgressHUD dismiss];
     }
 }
+
+//static double calculateDistance(int txPower, double rssi) {
+//    if (rssi == 0)
+//    {
+//        return -1.0; // if we cannot determine distance, return -1.
+//    }
+//    
+//    double ratio = rssi*1.0/txPower;
+//    
+//    if (ratio < 1.0)
+//    {
+//        return pow(ratio,10);
+//    }
+//    else
+//    {
+//        double accuracy =  (0.89976)*pow(ratio,7.7095) + 0.111;
+//        return accuracy;
+//    }
+//}
 
 - (void)drawLayoutForArray:(NSMutableArray *)arrTemp
 {
@@ -115,22 +173,76 @@
             {
                 isBeacon = YES;
             }
-            
-            shapeLayer = isBeacon ? [self initializeBeaconLayer] : [self initializeShapeLayerWithID:rack.rackType];
-            
-            X = X - HALF(width);
-            Y = Y - HALF(height);
-            width = width;
-            height = height;
-            
-            shapeLayer.path = [self drawRackFromStartingX:X
-                                                     andY:Y
-                                                withWidth:width
-                                                andHeight:height].CGPath;
-            
-            CGPathRef path = createPathRotatedAroundBoundingBoxCenter(shapeLayer.path, DEGREES_TO_RADIANS([rack.angle floatValue]));
-            shapeLayer.path  = path;
-            CGPathRelease(path);
+            if ([rack.rackType isEqualToString:@"8"])
+            {
+                X = X - HALF(width);
+                Y = Y - HALF(height);
+                width = width;
+                height = height;
+                
+                lblText = [self initializeTextLayerWithSize:CGRectZero];
+                lblText.frame = CGRectMake(X, Y, width, height);
+                
+                
+                //                lblText.text = @"";
+                
+                lblText.accessibilityIdentifier = rack.storeText;
+                
+                NSAttributedString *attrStr = [[NSAttributedString alloc] initWithData:[rack.storeText dataUsingEncoding:NSUnicodeStringEncoding]
+                                                                               options:@{NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType}
+                                                                    documentAttributes:nil
+                                                                                 error:nil];
+                lblText.attributedText = attrStr;
+                //                [lblText sizeToFit];
+                
+            }
+            else
+            {
+                shapeLayer = isBeacon ? [self initializeBeaconLayer] : [self initializeShapeLayerWithID:rack.rackType];
+                
+                
+                X = X - HALF(width);
+                Y = Y - HALF(height);
+                width = width;
+                height = height;
+                
+                shapeLayer.path = [self drawRackFromStartingX:X
+                                                         andY:Y
+                                                    withWidth:width
+                                                    andHeight:height].CGPath;
+                
+                if (!isBeacon) // if it's not a beacon
+                {
+//                    numberOfRacks++;
+//                    
+//                    [self addPointsForX:X + HALF(width)
+//                                   andY:Y + HALF(height)
+//                           forRackWidth:width
+//                              andHeight:height];
+//                    
+//                    [self addRoateButtonForX:X + HALF(width)
+//                                        andY:Y + HALF(height)
+//                                forRackWidth:width
+//                                   andHeight:height];
+                    
+                    
+                    
+                    CGPathRef path = createPathRotatedAroundBoundingBoxCenter(shapeLayer.path, DEGREES_TO_RADIANS([rack.angle floatValue]));
+                    shapeLayer.path  = path;
+                    CGPathRelease(path);
+                    
+//                    [arrRacks addObject:shapeLayer];
+//                    [arrTopPoints addObject:topPoint];
+//                    [arrBottomPoints addObject:bottomPoint];
+//                    [arrLeftPoints addObject:leftPoint];
+//                    [arrRightPoints addObject:rightPoint];
+//                    [arrRotateButtons addObject:btnRotate];
+                }
+                else
+                {
+//                    [arrBeacons addObject:shapeLayer];
+                }
+            }
         }
         isWalkingPath = NO;
         isBeacon = NO;
@@ -210,6 +322,23 @@ static CGPathRef createPathRotatedAroundBoundingBoxCenter(CGPathRef path, CGFloa
     [shapeLayer setName:identifier];
     [_imgBackground.layer insertSublayer:shapeLayer atIndex:1];
     return shapeLayer;
+}
+
+- (UILabel *)initializeTextLayerWithSize:(CGRect)rect
+{
+    UILabel *lblTextField = [[UILabel alloc] initWithFrame:CGRectZero];
+    lblTextField.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.15];
+
+    lblTextField.accessibilityIdentifier = @"<b>Please</b>  Enter Your Text Here";
+    NSAttributedString * attrStr = [[NSAttributedString alloc] initWithData:[lblTextField.accessibilityIdentifier dataUsingEncoding:NSUnicodeStringEncoding] options:@{ NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType } documentAttributes:nil error:nil];
+    lblTextField.attributedText = attrStr;
+    
+    lblTextField.textAlignment = NSTextAlignmentCenter;
+    [lblTextField sizeToFit];
+    lblTextField.userInteractionEnabled = YES;
+    
+    [_imgBackground addSubview:lblTextField];
+    return lblTextField;
 }
 
 - (CAShapeLayer *)initializeBeaconLayer
@@ -311,5 +440,335 @@ static CGPathRef createPathRotatedAroundBoundingBoxCenter(CGPathRef path, CGFloa
     
     [self.navigationController pushViewController:STORYBOARD_ID(@"idShoppingListVC") animated:YES];
 }
+
+
+- (void)locationManager:(CLLocationManager*)manager didEnterRegion:(CLRegion*)region
+{
+    NSLog(@"Entered %@", region);
+    UILocalNotification *ln = [[UILocalNotification alloc] init];
+    ln.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+    ln.alertTitle = @"You have entered in region.";
+    ln.alertBody = [NSString stringWithFormat:@"Hooray!!"];
+    ln.timeZone = [NSTimeZone defaultTimeZone];
+    [[UIApplication sharedApplication] scheduleLocalNotification:ln];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion*)region
+{
+    UILocalNotification *ln = [[UILocalNotification alloc] init];
+    ln.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+    ln.alertTitle = @"You have exited from region.";
+    ln.alertBody = [NSString stringWithFormat:@"Bye Bye!!"];
+    ln.timeZone = [NSTimeZone defaultTimeZone];
+    [[UIApplication sharedApplication] scheduleLocalNotification:ln];
+
+    //    CLBeaconRegion *beaconRegion = (CLBeaconRegion *)region;
+    //    //[self.locationManager stopRangingBeaconsInRegion:beaconRegion];
+    //
+    //    if ([Utility isApplicationStateInactiveORBackground])
+    //    {
+    //        if ([Function getCustomObjectFromUserDefaults_ForKey:@"Beacons"])
+    //        {
+    //            UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+    //
+    //            arrayBeacons = [Function getCustomObjectFromUserDefaults_ForKey:@"Beacons"];
+    //
+    //
+    //            NSString *stringUUID = @"";
+    //            for (int i = 0 ; i < arrayBeacons.count; i++)
+    //            {
+    //                if ([[[arrayBeacons objectAtIndex:i] valueForKey:@"uuid"] isEqualToString:beaconRegion.proximityUUID.UUIDString] && [[[arrayBeacons objectAtIndex:i] valueForKey:@"major"] isEqualToString:[NSString stringWithFormat:@"%@",beaconRegion.major]] && [[[arrayBeacons objectAtIndex:i] valueForKey:@"minor"] isEqualToString:[NSString stringWithFormat:@"%@",beaconRegion.minor]])
+    //                {
+    //                    stringUUID = [[arrayBeacons objectAtIndex:i] valueForKey:@"uuid"];
+    //                    localNotification.alertBody = [[arrayBeacons objectAtIndex:i] valueForKey:@"exit_text"];
+    //                    break;
+    //                }
+    //            }
+    //
+    //            localNotification.alertTitle = @"myTourisma";
+    //            localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+    //            localNotification.timeZone = [NSTimeZone defaultTimeZone];
+    //            localNotification.soundName = UILocalNotificationDefaultSoundName;
+    //            localNotification.applicationIconBadgeNumber= [[UIApplication sharedApplication] applicationIconBadgeNumber] + 1;
+    //            localNotification.userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"Exit", @"NotificationType",stringUUID, @"beaconUUID", nil];
+    //
+    //            [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+    //        }
+    //
+    //        for (int i = 0 ; i < arraySentNotifications.count; i++)
+    //        {
+    //            if ([[arraySentNotifications objectAtIndex:i] isEqualToString:[NSString stringWithFormat:@"%@ %@ %@",beaconRegion.proximityUUID.UUIDString,[NSString stringWithFormat:@"%@",beaconRegion.major],[NSString stringWithFormat:@"%@",beaconRegion.minor]]])
+    //            {
+    //                [arraySentNotifications removeObject:[NSString stringWithFormat:@"%@ %@ %@",beaconRegion.proximityUUID.UUIDString,[NSString stringWithFormat:@"%@",beaconRegion.major],[NSString stringWithFormat:@"%@",beaconRegion.minor]]];
+    //                [Function setCustomObjectToUserDefaults:arraySentNotifications ForKey:BeaconsNotificationArray];
+    //            }
+    //        }
+    //    }
+    //    else
+    //    {
+    //        if ([Function getCustomObjectFromUserDefaults_ForKey:@"Beacons"])
+    //        {
+    //            arrayBeacons = [Function getCustomObjectFromUserDefaults_ForKey:@"Beacons"];
+    //
+    //            for (int i = 0 ; i < arrayBeacons.count; i++)
+    //            {
+    //                if ([[[arrayBeacons objectAtIndex:i] valueForKey:@"uuid"] isEqualToString:beaconRegion.proximityUUID.UUIDString] && [[[arrayBeacons objectAtIndex:i] valueForKey:@"major"] isEqualToString:[NSString stringWithFormat:@"%@",beaconRegion.major]] && [[[arrayBeacons objectAtIndex:i] valueForKey:@"minor"] isEqualToString:[NSString stringWithFormat:@"%@",beaconRegion.minor]])
+    //                {
+    //                    [labelCustomText setText:[[arrayBeacons objectAtIndex:i] valueForKey:@"exit_text"]];
+    //                    [buttonCustomNotification setTag:3];
+    //                    [self displayCustomNotification];
+    //                    //[Global displayTost:[[arrayBeacons objectAtIndex:i] valueForKey:@"exit_text"]];
+    //                    break;
+    //                }
+    //            }
+    //
+    //            for (int i = 0 ; i < arraySentNotifications.count; i++)
+    //            {
+    //                if ([[arraySentNotifications objectAtIndex:i] isEqualToString:[NSString stringWithFormat:@"%@ %@ %@",beaconRegion.proximityUUID.UUIDString,[NSString stringWithFormat:@"%@",beaconRegion.major],[NSString stringWithFormat:@"%@",beaconRegion.minor]]])
+    //                {
+    //                    [arraySentNotifications removeObject:[NSString stringWithFormat:@"%@ %@ %@",beaconRegion.proximityUUID.UUIDString,[NSString stringWithFormat:@"%@",beaconRegion.major],[NSString stringWithFormat:@"%@",beaconRegion.minor]]];
+    //                    [Function setCustomObjectToUserDefaults:arraySentNotifications ForKey:BeaconsNotificationArray];
+    //                }
+    //            }
+    //        }
+    //    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager monitoringDidFailForRegion:(CLRegion *)region withError:(NSError *)error
+{
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+}
+
+double getDistance(int rssi, int txPower) {
+    /*
+     * RSSI = TxPower - 10 * n * lg(d)
+     * n = 2 (in free space)
+     *
+     * d = 10 ^ ((TxPower - RSSI) / (10 * n))
+     */
+    
+    return pow(10, ((double) txPower - rssi) / (10 * 2));
+}
+
+-(void)locationManager:(CLLocationManager*)manager didRangeBeacons:(NSArray*)beacons inRegion:(CLBeaconRegion*)region
+{
+//    NSLog(@"%@", beacons);
+    
+    if (beacons.count > 0)
+    {
+        CLBeacon *foundBeacon;
+        
+        for (int i = 0; i < beacons.count; i++)
+        {
+            foundBeacon = [beacons objectAtIndex:i];
+            
+            switch (foundBeacon.proximity)
+            {
+                case CLProximityImmediate:
+                    NSLog(@"found Intermediate %f", foundBeacon.accuracy);
+                    _lblDistance.text = [NSString stringWithFormat:@"found Intermediate %f", foundBeacon.accuracy];
+                    break;
+                    
+                case CLProximityFar:
+                    NSLog(@"found Far %f", foundBeacon.accuracy);
+                    _lblDistance.text = [NSString stringWithFormat:@"found Far %f", foundBeacon.accuracy];
+                    break;
+                    
+                case CLProximityNear:
+                    NSLog(@"found Near %f", foundBeacon.accuracy);
+                    _lblDistance.text = [NSString stringWithFormat:@"found Near %f", foundBeacon.accuracy];
+                    break;
+                    
+                case CLProximityUnknown:
+                    NSLog(@"found Unknown %f", foundBeacon.accuracy);
+                    _lblDistance.text = [NSString stringWithFormat:@"found Unknown %f", foundBeacon.accuracy];
+                    break;
+                    
+                default:
+                    break;
+            }
+            
+            if ([foundBeacon proximity] == CLProximityNear || [foundBeacon proximity] == CLProximityImmediate || [foundBeacon proximity] == CLProximityFar)
+            {
+//                UILocalNotification *ln = [[UILocalNotification alloc] init];
+//                ln.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+//                ln.alertTitle = @"You have entered in region.";
+//                ln.alertBody = [NSString stringWithFormat:@"Distance -> %.2f meters", foundBeacon.accuracy];
+//                ln.timeZone = [NSTimeZone defaultTimeZone];
+//                [[UIApplication sharedApplication] scheduleLocalNotification:ln];
+            }
+        }
+        
+    }
+//        if ([foundBeacon proximity] == CLProximityNear || [foundBeacon proximity] == CLProximityImmediate || [foundBeacon proximity] == CLProximityFar)
+    //    {
+    //        float intRange = 0;
+    //
+    //        UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+    //
+    //        if ([Function getCustomObjectFromUserDefaults_ForKey:@"Beacons"])
+    //        {
+    //            arrayBeacons = [Function getCustomObjectFromUserDefaults_ForKey:@"Beacons"];
+    //        }
+    //
+    //        NSString *stringUUID = @"";
+    //        NSString *stringMajor = @"";
+    //        NSString *stringMinor = @"";
+    //
+    //        for (int i = 0 ; i < arrayBeacons.count; i++)
+    //        {
+    //            if ([[[arrayBeacons objectAtIndex:i] valueForKey:@"uuid"] isEqualToString:foundBeacon.proximityUUID.UUIDString] && [[[arrayBeacons objectAtIndex:i] valueForKey:@"major"] isEqualToString:[NSString stringWithFormat:@"%@",foundBeacon.major]] && [[[arrayBeacons objectAtIndex:i] valueForKey:@"minor"] isEqualToString:[NSString stringWithFormat:@"%@",foundBeacon.minor]])
+    //            {
+    //                stringUUID = [[arrayBeacons objectAtIndex:i] valueForKey:@"uuid"];
+    //                stringMajor = [[arrayBeacons objectAtIndex:i] valueForKey:@"major"];
+    //                stringMinor = [[arrayBeacons objectAtIndex:i] valueForKey:@"minor"];
+    //                intRange = [[[arrayBeacons objectAtIndex:i] valueForKey:@"range"] floatValue];
+    //
+    //                NSString *stringClose = [[arrayBeacons objectAtIndex:i] valueForKey:@"is_close_approach"];
+    //                if ([stringClose isEqualToString:@"1"])
+    //                {
+    //                    localNotification.alertBody = [[arrayBeacons objectAtIndex:i] valueForKey:@"nearby_text"];
+    //                    localNotification.userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"Near", @"NotificationType",stringUUID, @"beaconUUID",stringMajor, @"beaconMajor",stringMinor, @"beaconMinor", nil];
+    //                    [buttonCustomNotification setTag:2];
+    //                }
+    //                else
+    //                {
+    //                    localNotification.alertBody = [[arrayBeacons objectAtIndex:i] valueForKey:@"entry_text"];
+    //                    localNotification.userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"Enter", @"NotificationType",stringUUID, @"beaconUUID",stringMajor, @"beaconMajor",stringMinor, @"beaconMinor", nil];
+    //                    [buttonCustomNotification setTag:1];
+    //                }
+    //
+    //                break;
+    //            }
+    //        }
+    //
+    //        localNotification.alertTitle = @"myTourisma";
+    //        localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+    //        localNotification.timeZone = [NSTimeZone defaultTimeZone];
+    //        localNotification.soundName = UILocalNotificationDefaultSoundName;
+    //        localNotification.applicationIconBadgeNumber = [[UIApplication sharedApplication] applicationIconBadgeNumber] + 1;
+    //
+    //
+    //        float intAbsRange = foundBeacon.accuracy;
+    //        intAbsRange = fabsf(intAbsRange);
+    //        //NSLog(@"abs range = %f",intAbsRange);
+    //
+    //        if (intAbsRange <= intRange)
+    //        {
+    //            //Notification sent or not
+    //            if ([Function getCustomObjectFromUserDefaults_ForKey:BeaconsNotificationArray])
+    //            {
+    //                arraySentNotifications = [Function getCustomObjectFromUserDefaults_ForKey:BeaconsNotificationArray];
+    //            }
+    //
+    //            if (arraySentNotifications.count > 0)
+    //            {
+    //                int intAlreadyGenerated = 0;
+    //                for (int i = 0 ; i < arraySentNotifications.count; i++)
+    //                {
+    //                    if ([[arraySentNotifications objectAtIndex:i] isEqualToString:[NSString stringWithFormat:@"%@ %@ %@",stringUUID,stringMajor,stringMinor]])
+    //                    {
+    //                        intAlreadyGenerated = 1;
+    //                    }
+    //                }
+    //
+    //                if (intAlreadyGenerated == 1)
+    //                {}
+    //                else
+    //                {
+    //                    if ([Utility isApplicationStateInactiveORBackground])
+    //                    {
+    //                        [arraySentNotifications addObject:[NSString stringWithFormat:@"%@ %@ %@",stringUUID,stringMajor,stringMinor]];
+    //                        [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+    //                        [Function setCustomObjectToUserDefaults:arraySentNotifications ForKey:BeaconsNotificationArray];
+    //                    }
+    //                    else
+    //                    {
+    //                        [arraySentNotifications addObject:[NSString stringWithFormat:@"%@ %@ %@",stringUUID,stringMajor,stringMinor]];//localNotification.alertBody
+    //                        [Function setCustomObjectToUserDefaults:arraySentNotifications ForKey:BeaconsNotificationArray];
+    //                        boolOpenBeaconPage = YES;
+    //                        [labelCustomText setText:localNotification.alertBody];
+    //                        [buttonCustomNotification setTitle:stringUUID forState:UIControlStateNormal];
+    //                        //[buttonCustomNotification setTag:2];
+    //                        [self displayCustomNotification];
+    //                    }
+    //                }
+    //            }
+    //            else
+    //            {
+    //                if ([Utility isApplicationStateInactiveORBackground])
+    //                {
+    //                    [arraySentNotifications addObject:[NSString stringWithFormat:@"%@ %@ %@",stringUUID,stringMajor,stringMinor]];
+    //                    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+    //                    [Function setCustomObjectToUserDefaults:arraySentNotifications ForKey:BeaconsNotificationArray];
+    //                }
+    //                else
+    //                {
+    //                    [arraySentNotifications addObject:[NSString stringWithFormat:@"%@ %@ %@",stringUUID,stringMajor,stringMinor]];
+    //                    [Function setCustomObjectToUserDefaults:arraySentNotifications ForKey:BeaconsNotificationArray];
+    //
+    //                    boolOpenBeaconPage = YES;
+    //                    [labelCustomText setText:localNotification.alertBody];
+    //                    [buttonCustomNotification setTitle:stringUUID forState:UIControlStateNormal];
+    //                    //[buttonCustomNotification setTag:2];
+    //                    [self displayCustomNotification];
+    //                }
+    //            }
+    //        }
+    //        else
+    //        {
+    //            /*for (int i = 0 ; i < arrayBeacons.count; i++)
+    //             {
+    //             if ([[[arrayBeacons objectAtIndex:i] valueForKey:@"uuid"] isEqualToString:foundBeacon.proximityUUID.UUIDString])
+    //             {
+    //             //manage beacons notification in array
+    //             if ([arraySentNotifications containsObject:[[arrayBeacons objectAtIndex:i] valueForKey:@"nearby_text"]])
+    //             {
+    //             [arraySentNotifications removeObject:[[arrayBeacons objectAtIndex:i] valueForKey:@"nearby_text"]];
+    //             [Function setCustomObjectToUserDefaults:arraySentNotifications ForKey:BeaconsNotificationArray];
+    //             }
+    //             }
+    //             }*/
+    //        }
+    //    }
+    //    else if ([foundBeacon proximity] == CLProximityImmediate)
+    //    {}
+    //    else if ([foundBeacon proximity] == CLProximityFar)
+    //    {}
+    //    else if ([foundBeacon proximity] == CLProximityUnknown)
+    //    {
+    //        /*for (int i = 0 ; i < arrayBeacons.count; i++)
+    //         {
+    //         if ([[[arrayBeacons objectAtIndex:i] valueForKey:@"uuid"] isEqualToString:foundBeacon.proximityUUID.UUIDString])
+    //         {
+    //         //manage beacons notification in array
+    //         if ([arraySentNotifications containsObject:[NSString stringWithFormat:@"%@ %@ %@",[[arrayBeacons objectAtIndex:i] valueForKey:@"uuid"],[[arrayBeacons objectAtIndex:i] valueForKey:@"major"],[[arrayBeacons objectAtIndex:i] valueForKey:@"minor"]]])
+    //         {
+    //         [arraySentNotifications removeObject:[NSString stringWithFormat:@"%@ %@ %@",[[arrayBeacons objectAtIndex:i] valueForKey:@"uuid"],[[arrayBeacons objectAtIndex:i] valueForKey:@"major"],[[arrayBeacons objectAtIndex:i] valueForKey:@"minor"]]];
+    //         [Function setCustomObjectToUserDefaults:arraySentNotifications ForKey:BeaconsNotificationArray];
+    //         }
+    //         }
+    //         }*/
+    //    }
+        
+}
+
+-(void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region
+{
+    if(state == CLRegionStateInside)
+    {
+    }
+    else if(state == CLRegionStateOutside)
+    {
+    }
+    else
+    {
+        return;
+    }
+}
+
 
 @end

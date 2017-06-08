@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+
 #define SYSTEM_VERSION_GRATERTHAN_OR_EQUALTO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 
 @interface AppDelegate ()
@@ -18,6 +19,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    
     if (SYSTEM_VERSION_GRATERTHAN_OR_EQUALTO(@"10.0"))
     {
         UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
@@ -42,6 +46,8 @@
 //    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     
     [self setRootViewControllerForUserLoggedIn:[DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID] == 0 ? NO : YES];
+    
+    [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     
     return YES;
 }
@@ -75,6 +81,66 @@
     NSLog(@"User Info : %@",response.notification.request.content.userInfo);
     completionHandler();
 }
+
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
+{
+    //Set icon badge number to zero
+    application.applicationIconBadgeNumber = 0;
+    
+    UIApplicationState state = [application applicationState];
+    if (state == UIApplicationStateActive)
+    {}
+    else
+    {
+//        NSString *stringNotificationType = [NSString stringWithFormat:@"%@",[notification.userInfo valueForKey:@"NotificationType"]];
+//        self.stringUUIDOfNotification = [NSString stringWithFormat:@"%@",[notification.userInfo valueForKey:@"beaconUUID"]];
+//        self.stringMajor = [NSString stringWithFormat:@"%@",[notification.userInfo valueForKey:@"beaconMajor"]];
+//        self.stringMinor = [NSString stringWithFormat:@"%@",[notification.userInfo valueForKey:@"beaconMinor"]];
+        //NSLog(@"uuid = %@",self.stringUUIDOfNotification);
+        
+//        if ([stringNotificationType isEqualToString:@"Enter"])
+//        {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"" object:nil];
+//        }
+//        else if ([stringNotificationType isEqualToString:@"Near"])
+//        {
+//            [[NSNotificationCenter defaultCenter] postNotificationName:@"" object:nil];
+//        }
+//        else if ([stringNotificationType isEqualToString:@"Exit"])
+//        {
+//            //[[NSNotificationCenter defaultCenter] postNotificationName:OpenBeaconsDetail object:nil];
+//        }
+    }
+    
+    
+    /*
+     if ([notification.alertBody containsString:@"exit"])
+     {}
+     else
+     {
+     //UIAlertView *alert1 = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@",[notification.userInfo valueForKey:@"beaconUUID"]] message:notification.alertBody delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+     //[alert1 show];
+     
+     //send notification and open beacons screen
+     self.stringUUIDOfNotification = [NSString stringWithFormat:@"%@",[notification.userInfo valueForKey:@"beaconUUID"]];
+     
+     [[NSNotificationCenter defaultCenter] postNotificationName:OpenBeaconsDetail object:nil];
+     }
+     
+     //app state
+     UIApplicationState state = [application applicationState];
+     if (state == UIApplicationStateActive)
+     {
+     //UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"yyyy" message:notification.alertBody delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+     //[alert show];
+     
+     //Generate custom notification and on its click manage further process
+     
+     }
+     */
+    
+}
+
 
 - (void)setRootViewControllerForUserLoggedIn:(BOOL)isLoggedin
 {
@@ -112,6 +178,26 @@
     [self.window setRootViewController:_drawerController];
 }
 
+-(void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region{
+    
+    UILocalNotification *notification = [[UILocalNotification alloc] init];
+    
+    if(state == CLRegionStateInside)
+    {
+        notification.alertBody = [NSString stringWithFormat:@"You are inside region %@", region.identifier];
+    }
+    else if(state == CLRegionStateOutside)
+    {
+        notification.alertBody = [NSString stringWithFormat:@"You are outside region %@", region.identifier];
+    }
+    else
+    {
+        return;
+    }
+    
+    [[UIApplication sharedApplication] presentLocalNotificationNow:notification];
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application
 {
 }
@@ -126,6 +212,12 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
+//    UILocalNotification *ln = [[UILocalNotification alloc] init];
+//    ln.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+//    ln.alertTitle = @"hjfdbv";
+//    ln.alertBody = @"mncbds csdchjsd c";
+//    ln.timeZone = [NSTimeZone defaultTimeZone];
+//    [[UIApplication sharedApplication] scheduleLocalNotification:ln];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
 #import "Store.h"
 
-@interface StoreVC : UIViewController
+@interface StoreVC : UIViewController <CLLocationManagerDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *lblTitle;
 @property (weak, nonatomic) IBOutlet UIButton *btnBack;
@@ -21,5 +22,8 @@
 
 - (IBAction)btnBackClicked:(id)sender;
 - (IBAction)btnShoppingListClicked:(id)sender;
+
+@property (strong, nonatomic) CLLocationManager *locationManager;
+@property (weak, nonatomic) IBOutlet UILabel *lblDistance;
 
 @end

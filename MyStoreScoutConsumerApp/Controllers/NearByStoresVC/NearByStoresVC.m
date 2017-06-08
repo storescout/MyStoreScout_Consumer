@@ -32,6 +32,11 @@
     [self setLayout];
     [self configureMap];
     [self.locationManager startUpdatingLocation];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
     [self getAllStores];
 }
 
@@ -408,6 +413,8 @@
             storeInfoVC.objStore = objStore;
             
             [self.navigationController pushViewController:storeInfoVC animated:YES];
+            
+            break;
         }
     }
 }

@@ -24,6 +24,7 @@
 @property (nonatomic, strong) NSString *positionX;
 @property (nonatomic, strong) NSString *storeId;
 @property (nonatomic, strong) NSString *rackType;
+@property (nonatomic, strong) NSString *storeText;
 
 + (Racks *)modelObjectWithDictionary:(NSDictionary *)dict;
 - (instancetype)initWithDictionary:(NSDictionary *)dict;
