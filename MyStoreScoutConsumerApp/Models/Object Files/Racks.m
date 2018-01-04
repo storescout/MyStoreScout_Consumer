@@ -24,6 +24,16 @@ NSString *const kRacksRackType = @"rack_type";
 NSString *const kStoreStoreText = @"store_text";
 
 
+
+//Added By : Anjali Jariwala
+NSString *const kStoreBeaconUuid = @"beacon_uuid";
+NSString *const kStoreBeaconMajor = @"beacon_major";
+NSString *const kStoreBeaconMinor = @"beacon_minor";
+NSString *const kStoreBeaconId = @"beacon_identifier";
+NSString *const kStoreBeaconType = @"beacon_type";
+NSString *const kStoreProductId = @"Product_id";
+NSString *const kStoreProductName = @"Product_name";
+
 @interface Racks ()
 
 - (id)objectOrNilForKey:(id)aKey fromDictionary:(NSDictionary *)dict;
@@ -46,7 +56,14 @@ NSString *const kStoreStoreText = @"store_text";
 @synthesize storeId = _storeId;
 @synthesize rackType = _rackType;
 @synthesize storeText = _storeText;
-
+//Added By: Anjali Jariwala
+@synthesize beaconUuid = _beaconUuid;
+@synthesize beaconMajor = _beaconMajor;
+@synthesize beaconMinor = _beaconMinor;
+@synthesize beaconIdentifier = _beaconIdentifier;
+@synthesize beaconType = _beaconType;
+@synthesize Product_id = _Product_id;
+@synthesize Product_name = _Product_name;
 
 + (Racks *)modelObjectWithDictionary:(NSDictionary *)dict
 {
@@ -75,6 +92,15 @@ NSString *const kStoreStoreText = @"store_text";
         self.storeId = [self objectOrNilForKey:kRacksStoreId fromDictionary:dict];
         self.rackType = [self objectOrNilForKey:kRacksRackType fromDictionary:dict];
         self.storeText = [self objectOrNilForKey:kStoreStoreText fromDictionary:dict];
+        self.Product_id = [self objectOrNilForKey:kStoreProductId fromDictionary:dict];
+        self.Product_name = [self objectOrNilForKey:kStoreProductName fromDictionary:dict];
+        
+        //Added By : Anjali Jariwala
+        self.beaconUuid = [self objectOrNilForKey:kStoreBeaconUuid fromDictionary:dict];
+        self.beaconMajor = [self objectOrNilForKey:kStoreBeaconMajor fromDictionary:dict];
+        self.beaconMinor = [self objectOrNilForKey:kStoreBeaconMinor fromDictionary:dict];
+        self.beaconIdentifier = [self objectOrNilForKey:kStoreBeaconId fromDictionary:dict];
+        self.beaconType = [self objectOrNilForKey:kStoreBeaconType fromDictionary:dict];
 
     }
     
@@ -99,7 +125,15 @@ NSString *const kStoreStoreText = @"store_text";
     [mutableDict setValue:self.storeId forKey:kRacksStoreId];
     [mutableDict setValue:self.rackType forKey:kRacksRackType];
     [mutableDict setValue:self.storeText forKey:kStoreStoreText];
-
+    
+    //Added By : Anjali Jariwala
+    [mutableDict setValue:self.beaconUuid forKey:kStoreBeaconUuid];
+    [mutableDict setValue:self.beaconMajor forKey:kStoreBeaconMajor];
+    [mutableDict setValue:self.beaconMinor forKey:kStoreBeaconMinor];
+    [mutableDict setValue:self.beaconIdentifier forKey:kStoreBeaconId];
+    [mutableDict setValue:self.Product_id forKey:kStoreProductId];
+    [mutableDict setValue:self.Product_name forKey:kStoreProductName];
+    [mutableDict setValue:self.beaconType forKey:kStoreBeaconType];
     return [NSDictionary dictionaryWithDictionary:mutableDict];
 }
 
@@ -136,6 +170,16 @@ NSString *const kStoreStoreText = @"store_text";
     self.storeId = [aDecoder decodeObjectForKey:kRacksStoreId];
     self.rackType = [aDecoder decodeObjectForKey:kRacksRackType];
     self.storeText = [aDecoder decodeObjectForKey:kStoreStoreText];
+    
+    
+    //Added By : Anjali Jariwala
+    self.beaconUuid = [aDecoder decodeObjectForKey:kStoreBeaconUuid];
+    self.beaconMajor = [aDecoder decodeObjectForKey:kStoreBeaconMajor];
+    self.beaconMinor = [aDecoder decodeObjectForKey:kStoreBeaconMinor];
+    self.beaconIdentifier = [aDecoder decodeObjectForKey:kStoreBeaconId];
+    self.Product_id = [aDecoder decodeObjectForKey:kStoreProductId];
+    self.Product_name = [aDecoder decodeObjectForKey:kStoreProductName];
+    self.beaconType = [aDecoder decodeObjectForKey:kStoreBeaconType];
     return self;
 }
 
@@ -156,6 +200,16 @@ NSString *const kStoreStoreText = @"store_text";
     [aCoder encodeObject:_storeId forKey:kRacksStoreId];
     [aCoder encodeObject:_rackType forKey:kRacksRackType];
     [aCoder encodeObject:_storeText forKey:kStoreStoreText];
+    
+    //Added By : Anjali Jariwala
+    [aCoder encodeObject:_beaconUuid forKey:kStoreBeaconUuid];
+    [aCoder encodeObject:_beaconMajor forKey:kStoreBeaconMajor];
+    [aCoder encodeObject:_beaconMinor forKey:kStoreBeaconMinor];
+    [aCoder encodeObject:_beaconIdentifier forKey:kStoreBeaconId];
+    [aCoder encodeObject:_Product_id forKey:kStoreProductId];
+    [aCoder encodeObject:_Product_name forKey:kStoreProductName];
+    [aCoder encodeObject:_beaconType forKey:kStoreBeaconType];
+    
 }
 
 

@@ -84,12 +84,13 @@
     if([[NetworkAvailability instance] isReachable])
     {
         [SVProgressHUD showWithStatus:GetAllStoresMsg];
-        
+        [self.view setUserInteractionEnabled:NO];
         long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
         
         [[WebServiceConnector alloc]init:URL_GetAllStores
                           withParameters:@{
-                                           @"user_id":[NSString stringWithFormat:@"%ld",user_id]
+                                           @"user_id":[NSString stringWithFormat:@"%ld",user_id],
+                                           @"role_id":role_id,
                                            }
                               withObject:self
                             withSelector:@selector(DisplayResults:)
@@ -107,6 +108,7 @@
 - (void)DisplayResults:(id)sender
 {
     [SVProgressHUD dismiss];
+    [self.view setUserInteractionEnabled:YES];
     if ([sender responseCode] != 100)
     {
         [AZNotification showNotificationWithTitle:[sender responseError]
@@ -125,16 +127,16 @@
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 //This code will run in the main thread:
-                CGRect frame = _tblSearchResults.frame;
-                frame.size.height = _tblSearchResults.contentSize.height;
-                _tblSearchResults.frame = frame;
+//                CGRect frame = _tblSearchResults.frame;
+//                frame.size.height = _tblSearchResults.contentSize.height;
+//                _tblSearchResults.frame = frame;
+                _tblSearchResults.frame = CGRectMake(_tblSearchResults.frame.origin.x, _tblSearchResults.frame.origin.y, _tblSearchResults.frame.size.width, [[UIScreen mainScreen] bounds].size.height - 65.0);
             });
 
             
             for (int i = 0; i<arrTempStores.count; i++)
             {
                 Store *objStore = [arrTempStores objectAtIndex:i];
-                
                 MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
                 [annotation setCoordinate:CLLocationCoordinate2DMake([objStore.latitude floatValue], [objStore.longitude floatValue])];
                 [annotation setTitle:objStore.storeName];
@@ -142,7 +144,7 @@
                 [self.mapView addAnnotation:annotation];
             }
             
-            MKMapRect zoomRect = MKMapRectNull;
+            /*MKMapRect zoomRect = MKMapRectNull;
             
             for (id <MKAnnotation> annotation in _mapView.annotations)
             {
@@ -151,7 +153,7 @@
                 zoomRect = MKMapRectUnion(zoomRect, pointRect);
             }
             
-            [_mapView setVisibleMapRect:zoomRect animated:YES];
+            [_mapView setVisibleMapRect:zoomRect animated:YES];*/
         }
         else
         {
@@ -216,9 +218,10 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         //This code will run in the main thread:
-        CGRect frame = _tblSearchResults.frame;
-        frame.size.height = _tblSearchResults.contentSize.height;
-        _tblSearchResults.frame = frame;
+//        CGRect frame = _tblSearchResults.frame;
+//        frame.size.height = _tblSearchResults.contentSize.height;
+//        _tblSearchResults.frame = frame;
+        _tblSearchResults.frame = CGRectMake(_tblSearchResults.frame.origin.x, _tblSearchResults.frame.origin.y, _tblSearchResults.frame.size.width, [[UIScreen mainScreen] bounds].size.height - 65.0);
         
     });
     //Store *objStore = [arrTempStores objectAtIndex:indexPath.row];
@@ -295,7 +298,7 @@
     }
 
     [self.locationManager startUpdatingLocation];
-    
+//    [self.mapView setShowsUserLocation:YES];
     MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(coordinates, 3000, 3000);
     MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:viewRegion];
     
@@ -337,9 +340,10 @@
         didRangeBeacons:(NSArray *)beacons
                inRegion:(CLBeaconRegion *)region
 {
+    
     if (beacons.count > 2)
     {
-//        CLBeacon *beaconA = [beacons objectAtIndex:0];
+        CLBeacon *beaconA = [beacons objectAtIndex:0];
 //        CLBeacon *beaconB = [beacons objectAtIndex:1];
 //        CLBeacon *beaconC = [beacons objectAtIndex:2];
         // caclculate each beacon distance from current location and through which get current location and start navigating
@@ -355,9 +359,8 @@
     coordinates.longitude=location.coordinate.longitude;
     latitude = location.coordinate.latitude;
     lontitude = location.coordinate.longitude;
-
     annotation.coordinate = coordinates;
-
+    
     if (isFirstTime)
     {
         self.mapView.centerCoordinate = annotation.coordinate;//self.mapView.userLocation.location.coordinate;
@@ -384,6 +387,11 @@
         
         annotationView.canShowCallout = YES;
         annotationView.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        UIButton *btnNavigation = [[UIButton alloc] initWithFrame:CGRectMake(0.0, 2.0, 30.0, 30.0)];
+        btnNavigation.tag = 20.0;
+//        [btnNavigation addTarget:self action:@selector(btnNavigationClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [btnNavigation setImage:[UIImage imageNamed:@"Navigation"] forState:UIControlStateNormal];
+        annotationView.leftCalloutAccessoryView = btnNavigation;
         
         return annotationView;
     }
@@ -402,21 +410,54 @@
 - (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
 {
     NSLog(@"%f %f",[view.annotation coordinate].latitude, [view.annotation coordinate].longitude);
+    CLGeocoder *ceo = [[CLGeocoder alloc] init];
+   
+    
     for (int i = 0; i<arrStores.count; i++)
     {
         Store *objStore = [arrStores objectAtIndex:i];
         
-        if ([objStore.latitude floatValue] == [view.annotation coordinate].latitude && [objStore.longitude floatValue] == [view.annotation coordinate].longitude)
-        {
-            StoreInfoVC *storeInfoVC = STORYBOARD_ID(@"idStoreInfoVC");
+        if (control.tag == 20.0) {
+            NSLog(@"Left Button Tapped");
+            if ([view.annotation.title isEqualToString:objStore.storeName] && [view.annotation.subtitle isEqualToString:objStore.storeAddress]) {
+                
+                [ceo reverseGeocodeLocation:[[CLLocation alloc] initWithLatitude:latitude longitude:lontitude]
+                          completionHandler:^(NSArray *placemarks, NSError *error) {
+                              CLPlacemark *placemark = [placemarks objectAtIndex:0];
+                              NSLog(@"placemark %@",placemark);
+                              NSString *locatedAt = [[placemark.addressDictionary valueForKey:@"FormattedAddressLines"] componentsJoinedByString:@", "];
+        
+                              NSString* directionsURL = [NSString stringWithFormat:@"http://maps.google.com/maps?saddr=%f,%f&daddr=%f,%f&travelmode=driving",latitude, lontitude, [objStore.latitude floatValue],[objStore.longitude floatValue]];
             
-            storeInfoVC.objStore = objStore;
+                              if ([[UIApplication sharedApplication] respondsToSelector:@selector(openURL:options:completionHandler:)]) {
+                                  [[UIApplication sharedApplication] openURL:[NSURL URLWithString: directionsURL] options:@{} completionHandler:^(BOOL success) {}];
+                              } else {
+                                  [[UIApplication sharedApplication] openURL:[NSURL URLWithString: directionsURL]];
+                              }
+                          }
+                 ];
+            }
             
-            [self.navigationController pushViewController:storeInfoVC animated:YES];
-            
-            break;
+           
         }
+        else
+        {
+            if ([objStore.latitude floatValue] == [view.annotation coordinate].latitude && [objStore.longitude floatValue] == [view.annotation coordinate].longitude)
+            {
+                
+                StoreInfoVC *storeInfoVC = STORYBOARD_ID(@"idStoreInfoVC");
+                
+                storeInfoVC.objStore = objStore;
+                
+                [self.navigationController pushViewController:storeInfoVC animated:YES];
+                
+                break;
+            }
+        }
+        
     }
+
+    
 }
 
 #pragma mark - Button Click Events
@@ -426,5 +467,6 @@
     [self.view endEditing:YES];
     [self.mm_drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
 }
+
 
 @end

@@ -183,6 +183,10 @@
                                                           options:UIViewAnimationOptionTransitionFlipFromLeft
                                                        animations:^{
                                                            _imgProfilePicture.image = finalImage;
+                                                           dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
+                                                                          {
+                                                                              strBase64 = [[BaseVC sharedInstance] encodeToBase64String:_imgProfilePicture.image];
+                                                                          });
                                                        } completion:nil];
                                    }];
     }
@@ -198,16 +202,17 @@
                                                           options:UIViewAnimationOptionTransitionFlipFromLeft
                                                        animations:^{
                                                            _imgProfilePicture.image = finalImage;
+                                                           dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
+                                                                          {
+                                                                              strBase64 = [[BaseVC sharedInstance] encodeToBase64String:_imgProfilePicture.image];
+                                                                          });
                                                        } completion:nil];
                                    }];
     }
     
 //    [picker dismissViewControllerAnimated:YES completion:nil];
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
-    {
-        strBase64 = [[BaseVC sharedInstance] encodeToBase64String:_imgProfilePicture.image];
-    });
+    
 }
 
 - (void)navigationController:(UINavigationController *)navigationController
@@ -253,9 +258,18 @@
     
     if ([_txtUsername.text isValid] && [_txtEmailAddress.text isValid] && [_txtMobileNumber.text isValid] && [_txtPassword.text isValid])
     {
+        
+        NSRange whiteSpaceRange = [_txtUsername.text rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet]];
+        if (whiteSpaceRange.location != NSNotFound) {
+            [AZNotification showNotificationWithTitle:@"Please enter username without whitespace"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+            return;
+        }
+        
         if ([_txtEmailAddress.text isValidEmail])
         {
-            if (_txtMobileNumber.text.length == 7)
+            if (_txtMobileNumber.text.length > 6 && _txtMobileNumber.text.length < 16)
             {
                 if ([_txtPassword.text isValidPassword])
                 {
@@ -265,21 +279,21 @@
                         NSString *strDeviceUDID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
                         
                         [SVProgressHUD showWithStatus:RegistrationMsg];
-                        
+                        [self.view setUserInteractionEnabled:NO];
                         [[WebServiceConnector alloc]init:URL_Registration
                                           withParameters:@{
-                                                           @"firstname":@"Bhargav",
-                                                           @"lastname":@"Kukadiya",
+                                                           @"firstname":_txtUsername.text,
+                                                           @"lastname":_txtUsername.text,
                                                            @"username":_txtUsername.text,
-                                                           @"role_id":@"1",
+                                                           @"role_id":role_id,
                                                            @"password":_txtPassword.text,
                                                            @"email_id":_txtEmailAddress.text,
                                                            @"phone_no":_txtMobileNumber.text,
-                                                           @"profile_pic":isImageSet ? strBase64 : @"",
+                                                           @"profile_image":isImageSet ? strBase64 : @"",
                                                            @"device_token":strDeviceToken.length > 0 ? strDeviceToken : @"",
                                                            @"device_udid":strDeviceUDID,
-                                                           @"device_made":@"iOS",
-                                                           @"is_testdata":@"1"
+                                                           @"device_make":@"iOS",
+                                                           @"is_testdata":isTestData
                                                            }
                                               withObject:self
                                             withSelector:@selector(DisplayResults:)
@@ -297,13 +311,15 @@
                 {
                     [[BaseVC sharedInstance] addAlertBoxWithText:@"Please provide valid password.\nUse minimum 8 and maximum 16 characters with at least 1 Alphabet, 1 Number and 1 Special Character."
                                                             toVC:self];
+                    return;
                 }
             }
             else
             {
-                [AZNotification showNotificationWithTitle:@"Please enter valid phone number"
+                [AZNotification showNotificationWithTitle:@"Phone number should be at least 7-15 digits"
                                                controller:self
                                          notificationType:AZNotificationTypeError];
+                return;
             }
         }
         else
@@ -311,18 +327,46 @@
             [AZNotification showNotificationWithTitle:@"Please enter valid email address"
                                            controller:self
                                      notificationType:AZNotificationTypeError];
+            return;
         }
     }
     else
     {
-        [AZNotification showNotificationWithTitle:@"Please fill all mandatory fields"
-                                       controller:self
-                                 notificationType:AZNotificationTypeError];
+        //[_txtUsername.text isValid] && [_txtEmailAddress.text isValid] && [_txtMobileNumber.text isValid] && [_txtPassword.text isValid]
+        if (![_txtUsername.text isValid]) {
+            [AZNotification showNotificationWithTitle:@"Please enter username"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+            return;
+        }
+        
+        if (![_txtEmailAddress.text isValid]) {
+            [AZNotification showNotificationWithTitle:@"Please enter email id"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+            return;
+        }
+        
+        if (![_txtMobileNumber.text isValid]) {
+            [AZNotification showNotificationWithTitle:@"Please enter mobile number"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+            return;
+        }
+        
+        if (![_txtPassword.text isValid]) {
+            [AZNotification showNotificationWithTitle:@"Please enter password"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+            return;
+        }
+        
     }
 }
 
 - (void)DisplayResults:(id)sender
 {
+    [self.view setUserInteractionEnabled:YES];
     [SVProgressHUD dismiss];
     if ([sender responseCode] != 100)
     {
@@ -332,6 +376,9 @@
     }
     else
     {
+     
+        
+        
         if (STATUS([[sender responseDict] valueForKey:@"status"]))
         {
             User *objUser = [[sender responseArray] objectAtIndex:0];

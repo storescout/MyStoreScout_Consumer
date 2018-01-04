@@ -26,6 +26,15 @@
 @property (nonatomic, strong) NSString *rackType;
 @property (nonatomic, strong) NSString *storeText;
 
+//Added By : Anjali Jariwala
+@property (nonatomic, strong) NSString *beaconUuid;
+@property (nonatomic, strong) NSString *beaconMajor;
+@property (nonatomic, strong) NSString *beaconMinor;
+@property (nonatomic, strong) NSString *beaconIdentifier;
+@property (nonatomic, strong) NSString *beaconType;
+@property (nonatomic, strong) NSString *Product_id;
+@property (nonatomic, strong) NSString *Product_name;
+
 + (Racks *)modelObjectWithDictionary:(NSDictionary *)dict;
 - (instancetype)initWithDictionary:(NSDictionary *)dict;
 - (NSDictionary *)dictionaryRepresentation;

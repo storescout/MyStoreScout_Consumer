@@ -10,7 +10,6 @@
 
 @implementation BaseVC
 
-
 /* ----------------------------------------------- */
 
 + (instancetype)sharedInstance

@@ -29,6 +29,7 @@
                     forServiceType:(NSString *)serviceType/* serviceType: {GET, POST, JSON} */
                     showDisplayMsg:(NSString *)message
 {
+    
     WebServiceResponse *server = [WebServiceResponse sharedMediaServer];
     ShowNetworkIndicator(YES);
     responseCode = 100;
@@ -56,7 +57,6 @@
     }
     //[SVProgressHUD showWithStatus:message maskType:SVProgressHUDMaskTypeBlack];
 
-    
     [server initWithWebRequests:URLRequest inBlock:^(NSError *error, id objects, NSString *responseString)
      {
          if (error)

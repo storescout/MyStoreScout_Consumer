@@ -16,6 +16,7 @@
 
 /* -------------------------- */
 
+
 - (void)addAlertBoxWithText:(NSString *)message
                        toVC:(UIViewController *)VC;
 
@@ -53,5 +54,6 @@
 - (UIImage *)compressImage:(UIImage *)image;
 
 /* -------------------------- */
-
+@property (nonatomic, readwrite) NSArray *arrGlobalBeacon;
+@property (nonatomic, readwrite) NSString *strStoreName;
 @end

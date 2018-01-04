@@ -7,15 +7,17 @@
 //
 
 #import "AppDelegate.h"
+#import <Popover/Popover-Swift.h>
+#import "BaseVC.h"
 
 #define SYSTEM_VERSION_GRATERTHAN_OR_EQUALTO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 
 @interface AppDelegate ()
-
+@property (strong, nonatomic) Popover *popover;
 @end
 
 @implementation AppDelegate
-
+@synthesize arrGlobalBeacon;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -180,7 +182,33 @@
 
 -(void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region{
     
-    UILocalNotification *notification = [[UILocalNotification alloc] init];
+    NSLog(@"sbbhsjh");
+    BaseVC *base = [BaseVC sharedInstance];
+    NSArray *arrTempBeacon = base.arrGlobalBeacon;
+    NSArray *arrFiltered = [arrTempBeacon filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"beaconIdentifier == %@", region.identifier]];
+    if (arrFiltered.count > 0) {
+        if ([[arrFiltered[0] valueForKey:@"beaconType"] isEqualToString:@"0"]) {
+            //Indicate Entry point beacon
+            UILocalNotification *notification = [[UILocalNotification alloc] init];
+            
+            if(state == CLRegionStateInside)
+            {
+                notification.alertBody = [NSString stringWithFormat:@"You are inside %@", base.strStoreName];
+            }
+            [[UIApplication sharedApplication] presentLocalNotificationNow:notification];
+        }
+        else if ([[arrFiltered[0] valueForKey:@"beaconType"] isEqualToString:@"1"])
+        {
+            //Indicate Exit point beacon
+            UILocalNotification *notification = [[UILocalNotification alloc] init];
+            if(state == CLRegionStateInside)
+            {
+                notification.alertBody = [NSString stringWithFormat:@"You are outside %@", base.strStoreName];
+            }
+            [[UIApplication sharedApplication] presentLocalNotificationNow:notification];
+        }
+    }
+   /* UILocalNotification *notification = [[UILocalNotification alloc] init];
     
     if(state == CLRegionStateInside)
     {
@@ -195,7 +223,13 @@
         return;
     }
     
-    [[UIApplication sharedApplication] presentLocalNotificationNow:notification];
+//    UIView *vw = [[UIView alloc] initWithFrame:CGRectMake(10.0, 10.0, 100, 100)];
+//    _popover = [[Popover alloc] init];
+//    _popover.popoverType = UIPopoverArrowDirectionDown;
+//    _popover.popoverColor = [UIColor redColor];
+//    [_popover show:vw point:[self visibleViewController:[UIApplication sharedApplication].keyWindow.rootViewController].view.frame.origin];
+//
+    [[UIApplication sharedApplication] presentLocalNotificationNow:notification];*/
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

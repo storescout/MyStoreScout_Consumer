@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+@import GoogleMobileAds;
 
-@interface ShoppingListVC : UIViewController <UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate, UITextFieldDelegate, UIGestureRecognizerDelegate>
+@interface ShoppingListVC : UIViewController <UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate, UITextFieldDelegate, UIGestureRecognizerDelegate,GADBannerViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *vwPopUp;
 @property (strong, nonatomic) IBOutlet UITableView *tblShoppingList;
@@ -23,6 +24,10 @@
 @property (strong, nonatomic) IBOutlet UIView *vwAddItemContainer;
 @property (strong, nonatomic) IBOutlet UITableView *tblResults;
 @property (weak, nonatomic) IBOutlet UILabel *lblAddItem;
+@property (weak, nonatomic) IBOutlet GADBannerView *bannerView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *hideBannerviewConstant;
+
+
 
 - (IBAction)btnOptionsClicked:(id)sender;
 - (IBAction)btnBackClicked:(id)sender;

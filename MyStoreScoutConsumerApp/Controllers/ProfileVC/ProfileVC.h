@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+@import GoogleMobileAds;
 
-@interface ProfileVC : UIViewController <UITextFieldDelegate, UIActionSheetDelegate, UIGestureRecognizerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+@interface ProfileVC : UIViewController <UITextFieldDelegate, UIActionSheetDelegate, UIGestureRecognizerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, GADBannerViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIImageView *imgProfilePicture;
 @property (weak, nonatomic) IBOutlet UIView *vwImageContainer;
@@ -23,6 +24,8 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnSave;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *vwOfScrollViewHeight;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *bottomSpace;
+@property (strong, nonatomic) IBOutlet GADBannerView *bannerView;
 
 - (IBAction)btnEditClicked:(id)sender;
 - (IBAction)btnBackClicked:(id)sender;

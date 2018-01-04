@@ -18,6 +18,7 @@
     NSString *strBase64;
     UIImage *tempImage, *mainImage;
     UIImagePickerController *imagePickerController;
+    BOOL areAdsRemoved;
 }
 @end
 
@@ -26,6 +27,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    areAdsRemoved = [[NSUserDefaults standardUserDefaults] boolForKey:@"areAdsRemoved"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     strBase64 = @"";
     isImageChanged = NO;
@@ -73,6 +76,7 @@
         [self.scrollView setScrollEnabled:NO];
     });
     
+    [self loadAds];
     [self tapGestureInitialize];
     [self integrateNextButtonToolBar];
     
@@ -102,17 +106,23 @@
         _imgProfilePicture.image = [UIImage imageNamed:@"IMG_DEFAULT_PROFILE"];
         mainImage = [UIImage imageNamed:@"IMG_DEFAULT_PROFILE"];
     }
+    _imgProfilePicture.contentMode = UIViewContentModeScaleAspectFill;
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
+    areAdsRemoved = [[NSUserDefaults standardUserDefaults] boolForKey:@"areAdsRemoved"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
     if (!([UIApplication sharedApplication].statusBarStyle == UIStatusBarStyleLightContent))
     {
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
         [self setNeedsStatusBarAppearanceUpdate];
     }
+    
+   
 }
 
 - (void)didReceiveMemoryWarning
@@ -382,7 +392,7 @@
     {
         if ([_txtEmailAddress.text isValidEmail])
         {
-            if (_txtMobileNumber.text.length == 7)
+            if (_txtMobileNumber.text.length > 6 && _txtMobileNumber.text.length < 16)
             {
                 if (_txtOldPassword.text.length > 0 || _txtNewPassword.text.length > 0 || _txtConfirmPassword.text.length > 0)
                 {
@@ -390,6 +400,13 @@
                     {
                         if ([_txtOldPassword.text isValidPassword] && [_txtNewPassword.text isValidPassword] && [_txtConfirmPassword.text isValidPassword])
                         {
+                            if ([_txtOldPassword.text isEqualToString:_txtNewPassword.text]) {
+                                [AZNotification showNotificationWithTitle:@"Old and New password must be different"
+                                                               controller:self
+                                                         notificationType:AZNotificationTypeError];
+                                return;
+                            }
+                            
                             if ([_txtNewPassword.text isEqualToString:_txtConfirmPassword.text])
                             {
                                 // TODO: Calling WS
@@ -398,11 +415,11 @@
                                     long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
                                     
                                     [SVProgressHUD showWithStatus:EditProfileMsg];
-
+                                    [self.view setUserInteractionEnabled:NO];
                                     [[WebServiceConnector alloc]init:URL_EditProfile
                                                       withParameters:@{
                                                                        @"user_id":[NSString stringWithFormat:@"%ld", user_id],
-                                                                       @"role_id":@"1",
+                                                                       @"role_id":role_id,
                                                                        @"profile_pic":strBase64,
                                                                        @"is_image_changed":isImageChanged ? @"1" : @"0",
                                                                        @"username":_txtUserName.text,
@@ -425,22 +442,58 @@
                             }
                             else
                             {
-                                [AZNotification showNotificationWithTitle:@"New passwords mismatched with each other"
+                                [AZNotification showNotificationWithTitle:@"New and Confirm password must be same"
                                                                controller:self
                                                          notificationType:AZNotificationTypeError];
                             }
                         }
                         else
                         {
-                            [[BaseVC sharedInstance] addAlertBoxWithText:@"Please provide valid password.\nUse minimum 8 and maximum 16 characters with at least 1 Alphabet, 1 Number and 1 Special Character."
+                            
+//                            [[BaseVC sharedInstance] addAlertBoxWithText:@"Please provide valid password.\nUse minimum 8 and maximum 16 characters with at least 1 Alphabet, 1 Number and 1 Special Character."
+//                                                                    toVC:self];
+                            [[BaseVC sharedInstance] addAlertBoxWithText:@"Use minimum 8 and maximum 16 characters password with at least 1 Alphabet, 1 Number and 1 Special character."
                                                                     toVC:self];
                         }
                     }
                     else
                     {
-                        [AZNotification showNotificationWithTitle:@"Please fill all mandatory fields"
-                                                       controller:self
-                                                 notificationType:AZNotificationTypeError];
+                        if (_txtOldPassword.text.length == 0) {
+                            
+                            [[BaseVC sharedInstance] addAlertBoxWithText:@"Please enter old password."
+                                                                    toVC:self];
+                            
+//                            [AZNotification showNotificationWithTitle:@"Please enter old password"
+//                                                           controller:self
+//                                                     notificationType:AZNotificationTypeError];
+                            return;
+                        }
+                        
+                        if (_txtNewPassword.text.length == 0) {
+                            
+                            [[BaseVC sharedInstance] addAlertBoxWithText:@"Please enter new password."
+                                                                    toVC:self];
+//                            [AZNotification showNotificationWithTitle:@"Please enter new password"
+//                                                           controller:self
+//                                                     notificationType:AZNotificationTypeError];
+                            return;
+                        }
+                        
+                        if (_txtConfirmPassword.text.length == 0) {
+                            
+                            [[BaseVC sharedInstance] addAlertBoxWithText:@"Please enter confirm password."
+                                                                    toVC:self];
+                            
+//                            [AZNotification showNotificationWithTitle:@"Please enter confirm password"
+//                                                           controller:self
+//                                                     notificationType:AZNotificationTypeError];
+                            return;
+                        }
+                        
+                        
+//                        [AZNotification showNotificationWithTitle:@"Please fill all mandatory fields"
+//                                                       controller:self
+//                                                 notificationType:AZNotificationTypeError];
                     }
                 }
                 else
@@ -451,11 +504,11 @@
                         long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
                         
                         [SVProgressHUD showWithStatus:EditProfileMsg];
-
+                        [self.view setUserInteractionEnabled:NO];
                         [[WebServiceConnector alloc]init:URL_EditProfile
                                           withParameters:@{
                                                            @"user_id":[NSString stringWithFormat:@"%ld", user_id],
-                                                           @"role_id":@"1",
+                                                           @"role_id":role_id,
                                                            @"profile_pic":strBase64,
                                                            @"is_image_changed":isImageChanged ? @"1" : @"0",
                                                            @"username":_txtUserName.text,
@@ -493,16 +546,34 @@
     }
     else
     {
-        [AZNotification showNotificationWithTitle:@"Please fill all mandatory fields"
-                                       controller:self
-                                 notificationType:AZNotificationTypeError];
+        if ([_txtUserName.text isValid]) {
+            [AZNotification showNotificationWithTitle:@"Please enter username"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+            return;
+        }
+        
+        if ([_txtEmailAddress.text isValid]) {
+            [AZNotification showNotificationWithTitle:@"Please enter email id"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+            return;
+        }
+        
+        if ([_txtMobileNumber.text isValid]) {
+            [AZNotification showNotificationWithTitle:@"Please enter mobile number"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+            return;
+        }
     }
 }
 
 - (void)DisplayResults:(id)sender
 {
+    [self.view setUserInteractionEnabled:YES];
     [SVProgressHUD dismiss];
-    
+    [self.view setUserInteractionEnabled:YES];
     if ([sender responseCode] != 100)
     {
         [AZNotification showNotificationWithTitle:[sender responseError]
@@ -548,7 +619,9 @@
             
             [self btnEditClicked:nil];
             
-            [AZNotification showNotificationWithTitle:@"Changes has been saved successfully"
+            
+            
+            [AZNotification showNotificationWithTitle:@"Profile updated successfully"
                                            controller:self
                                      notificationType:AZNotificationTypeSuccess];
         }
@@ -559,6 +632,23 @@
                                      notificationType:AZNotificationTypeError];
         }
     }
+}
+
+#pragma mark - GAD Ads functions
+-(void)loadAds
+{
+    if (areAdsRemoved) {
+        _bottomSpace = 0;
+        [self.view updateConstraintsIfNeeded];
+    }
+    else
+    {
+        _bannerView.adUnitID = @"ca-app-pub-3940256099942544/2934735716";
+        _bannerView.delegate = self;
+        _bannerView.rootViewController = self;
+        [_bannerView loadRequest:[GADRequest request]];
+    }
+    
 }
 
 @end

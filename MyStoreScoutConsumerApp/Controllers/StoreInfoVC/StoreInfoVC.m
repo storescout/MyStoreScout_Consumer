@@ -16,8 +16,10 @@
     double latitude;
     double lontitude;
     CLLocationCoordinate2D coordinates;
+    BOOL isCounterUpdate;
 }
 @end
+
 
 @implementation StoreInfoVC
 
@@ -26,11 +28,19 @@
     [super viewDidLoad];
     
     [self configureMap];
-    
+    isCounterUpdate = NO;
     _lblTitle.text = _objStore.storeName;
     _lblAddress.text = _objStore.storeAddress;
     _lblContactNumber.text = _objStore.contactNo;
-    _lblTimings.text = [NSString stringWithFormat:@"%@ - %@", _objStore.startTime, _objStore.endTime];
+    
+    NSDateFormatter *dateFormatter1 = [[NSDateFormatter alloc] init];
+    [dateFormatter1 setDateFormat:@"hh:mm a"];
+    NSDateFormatter *dateFormatter2 = [[NSDateFormatter alloc] init];
+    [dateFormatter2 setDateFormat:@"HH:mm:ss"];
+    NSString *strStartTime = [dateFormatter1 stringFromDate:[dateFormatter2 dateFromString:_objStore.startTime]];
+    NSString *strEndTime = [dateFormatter1 stringFromDate:[dateFormatter2 dateFromString:_objStore.endTime]];
+    
+    _lblTimings.text = [NSString stringWithFormat:@"%@ - %@", strStartTime, strEndTime];
     
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                                  action:@selector(contactNumberTapped:)];
@@ -79,6 +89,7 @@
 
 - (void)configureMap
 {
+    
     if ([CLLocationManager locationServicesEnabled])
     {
         if (self.locationManager == nil)
@@ -118,6 +129,15 @@
     lontitude = location.coordinate.longitude;
     
     annotation.coordinate = coordinates;
+    CLLocation *userLocation = [[CLLocation alloc] initWithLatitude:latitude longitude:lontitude];
+    CLLocation *storeLocation = [[CLLocation alloc] initWithLatitude:[_objStore.latitude floatValue] longitude:[_objStore.longitude floatValue]];
+    CLLocationDistance distance = [userLocation distanceFromLocation:storeLocation];
+    NSLog(@"Distance: %f",distance);
+    if (distance < 1 && !isCounterUpdate) {
+        isCounterUpdate = YES;
+        NSLog(@"Location matched");
+        [self UpdateChekoutOptionCounterStoreId:_objStore.storeIdentifier];
+    }
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)theMapView viewForAnnotation:(id <MKAnnotation>)annotation
@@ -206,9 +226,60 @@
 
 - (IBAction)btnDirectionsClicked:(id)sender
 {
-    NSString *url = [NSString stringWithFormat:@"http://maps.apple.com/?saddr=%f,%f&daddr=%f,%f", latitude, lontitude, [_objStore.latitude floatValue], [_objStore.longitude floatValue]];
+//    NSString *url = [NSString stringWithFormat:@"http://maps.apple.com/?saddr=%f,%f&daddr=%f,%f", latitude, lontitude, [_objStore.latitude floatValue], [_objStore.longitude floatValue]];
+     NSString* url = [NSString stringWithFormat:@"http://maps.google.com/maps?saddr=%f,%f&daddr=%f,%f&travelmode=driving",latitude, lontitude, [_objStore.latitude floatValue],[_objStore.longitude floatValue]];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
     
 }
 
+#pragma mark ----------- User defined function -----------
+- (void)UpdateChekoutOptionCounterStoreId:(NSString *)strStoreId
+{
+    if([[NetworkAvailability instance] isReachable])
+    {
+        //        [SVProgressHUD showWithStatus:GetAllStoresMsg];
+        
+        long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
+        
+        [[WebServiceConnector alloc]init:URL_CheckOutCount
+                          withParameters:@{
+                                           @"user_id":[NSString stringWithFormat:@"%ld",user_id],
+                                           @"Store_id":strStoreId,
+                                           @"is_testdata":isTestData,
+                                           @"is_deletedata":@"0"
+                                           }
+                              withObject:self
+                            withSelector:@selector(DisplayResults:)
+                          forServiceType:@"JSON"
+                          showDisplayMsg:@""];
+    }
+    else
+    {
+        [AZNotification showNotificationWithTitle:NETWORK_ERR
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
+}
+
+- (void)DisplayResults:(id)sender
+{
+    [SVProgressHUD dismiss];
+    if ([sender responseCode] != 100)
+    {
+        [AZNotification showNotificationWithTitle:[sender responseError]
+                                       controller:self
+                                 notificationType:AZNotificationTypeError];
+    }
+    else
+    {
+        if (STATUS([[sender responseDict] valueForKey:@"status"]))
+        {
+            NSLog(@"%@", [[sender responseDict] valueForKey:@"message"]);
+        }
+        else
+        {
+            [AZNotification showNotificationWithTitle:[[sender responseDict] valueForKey:@"message"] controller:self notificationType:AZNotificationTypeError];
+        }
+    }
+}
 @end

@@ -64,6 +64,8 @@
 #define APP_NAME @"MyStoreScout"
 
 #define NETWORK_ERR @"Please check your internet connectivity"
+#define IsBought_ERR @"Product not available in your shoppinglist"
+#define AlreadyPurchase_ERR @"Product already purchased"
 
 #define KEY_DEVICE_TOKEN @"DeviceToken"
 #define KEY_USER_ID @"USER_ID"

@@ -17,6 +17,7 @@
 @property (strong, nonatomic) MMDrawerController *drawerController;
 
 @property (strong, nonatomic) UIImage *imgUserProfile;
+@property (strong, nonatomic) NSArray *arrGlobalBeacon;
 
 @property (strong, nonatomic) CLLocationManager *locationManager;
 

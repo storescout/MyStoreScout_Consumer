@@ -90,15 +90,15 @@
         if([[NetworkAvailability instance] isReachable])
         {
             NSString *strDeviceToken = [DefaultsValues getStringValueFromUserDefaults_ForKey:KEY_DEVICE_TOKEN];
-            
+            [self.view setUserInteractionEnabled:NO];
             [SVProgressHUD showWithStatus:LoginMsg];
             
             [[WebServiceConnector alloc]init:URL_Login
                               withParameters:@{
                                                @"username":_txtusername.text,
                                                @"password":_txtPassword.text,
-                                               @"role_id":@"1",
-                                               @"is_testdata":@"1",
+                                               @"role_id":role_id,
+                                               @"is_testdata":isTestData,
                                                @"device_token":strDeviceToken.length > 0 ? strDeviceToken : @"",
                                                }
                                   withObject:self
@@ -108,23 +108,56 @@
         }
         else
         {
-            [AZNotification showNotificationWithTitle:NETWORK_ERR
-                                           controller:self
-                                     notificationType:AZNotificationTypeError];
+            if ([_txtusername.text isValid] == FALSE) {
+//                [AZNotification showNotificationWithTitle:@"Please enter username"
+//                                               controller:self
+//                                         notificationType:AZNotificationTypeError];
+                [[BaseVC sharedInstance] addAlertBoxWithText:@"Please enter username."
+                                                        toVC:self];
+                
+                return;
+            }
+            
+            if ([_txtPassword.text isValid] == FALSE) {
+                [[BaseVC sharedInstance] addAlertBoxWithText:@"Please enter password."
+                                                        toVC:self];
+//                [AZNotification showNotificationWithTitle:@"Please enter password"
+//                                               controller:self
+//                                         notificationType:AZNotificationTypeError];
+                return;
+            }
+//            [AZNotification showNotificationWithTitle:NETWORK_ERR
+//                                           controller:self
+//                                     notificationType:AZNotificationTypeError];
         }
     }
     else
     {
-        [AZNotification showNotificationWithTitle:@"Please fill all mandatory fields"
-                                       controller:self
-                                 notificationType:AZNotificationTypeError];
+        if (![_txtusername.text isValid]) {
+            [AZNotification showNotificationWithTitle:@"Please enter username"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+//            [[BaseVC sharedInstance] addAlertBoxWithText:@"Please enter username."
+//                                                    toVC:self];
+            return;
+        }
+        
+        if (![_txtPassword.text isValid]) {
+            [AZNotification showNotificationWithTitle:@"Please enter password"
+                                           controller:self
+                                     notificationType:AZNotificationTypeError];
+//            [[BaseVC sharedInstance] addAlertBoxWithText:@"Please enter password."
+//                                                    toVC:self];
+            return;
+        }
+
     }
 }
 
 - (void)DisplayResults:(id)sender
 {
     [SVProgressHUD dismiss];
-    
+    [self.view setUserInteractionEnabled:YES];
     if ([sender responseCode] != 100)
     {
         [AZNotification showNotificationWithTitle:[sender responseError]
@@ -133,6 +166,7 @@
     }
     else
     {
+        NSLog(@"RESPONSE: %@", [sender responseArray]);
         if (STATUS([[sender responseDict] valueForKey:@"status"]))
         {
             User *objUser = [[sender responseArray] objectAtIndex:0];
@@ -213,12 +247,12 @@
        if([[NetworkAvailability instance] isReachable])
        {
            [SVProgressHUD showWithStatus:ForgotPasswordMsg];
-           
+           [self.view setUserInteractionEnabled:NO];
            [[WebServiceConnector alloc]init:URL_ForgotPassword
                              withParameters:@{
                                               @"email_id":strEmail,
-                                              @"role_id":@"1",
-                                              @"is_testdata":@"1"
+                                              @"role_id":role_id,
+                                              @"is_testdata":isTestData
                                               }
                                  withObject:self
                                withSelector:@selector(DisplayMessage:)
@@ -236,6 +270,7 @@
 
 - (void)DisplayMessage:(id)sender
 {
+    [self.view setUserInteractionEnabled:YES];
     [SVProgressHUD dismiss];
     if ([sender responseCode] != 100)
     {

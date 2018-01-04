@@ -17,6 +17,13 @@
 
 /* ============================================================================ */
 #pragma mark - Web Service Requests
+//CGLine's Constant
+#define MT_EPS      1e-4
+#define MT_MIN(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
+#define MT_MAX(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
+#define MT_ABS(A)	({ __typeof__(A) __a = (A); __a < 0 ? -__a : __a; })
+
+
 #define Server_URL    "http://54.70.249.239/MyStoreScoutWS/MobileAppService.php?Service="
 
 #define Image_Path "http://54.70.249.239/img/"
@@ -53,6 +60,13 @@
 #define URL_CheckAllShoppingListProductsAsBought [NSString stringWithFormat:@"%sCheckAllShoppingListProductsAsBought",Server_URL]
 
 #define URL_DeleteAllProductsFromShoppingList [NSString stringWithFormat:@"%sDeleteAllProductsFromShoppingList",Server_URL]
+
+//Edited By: Anjali Jariwala
+#define URL_CheckOutCount [NSString stringWithFormat:@"%sCheckoutCount",Server_URL]
+
+#define URL_GetAllOffers [NSString stringWithFormat:@"%sgetStorewiseOffer",Server_URL]
+
+//Updated By :
 
 /* ============================================================================ */
 #pragma mark - Class,Json Key and Message
@@ -136,6 +150,15 @@
 
 #define WSRegisterKeyMessage @"message"
 #define WSRegisterKeyStatus @"status"
+
+//Edited By: Anjali Jariwala
+#define GetAllOffersClass @"Store"
+#define GetAllOffersEntity @""
+#define GetAllOffersKey @"data"
+#define GetAllOffersMsg [NSString stringWithFormat:@"Loading Offers"]
+
+#define isTestData @"1"
+#define role_id @"0"
 
 
 /* ============================================================================ */

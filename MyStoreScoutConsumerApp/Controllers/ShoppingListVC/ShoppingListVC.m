@@ -9,7 +9,9 @@
 #import "ShoppingListVC.h"
 #import "ShoppingListCell.h"
 #import "Products.h"
+#import "StoreVC.h"
 #import "ShoppingList.h"
+
 
 @interface ShoppingListVC ()
 {
@@ -17,14 +19,24 @@
     NSMutableArray *arrResults;
     UIRefreshControl *refreshControl;
     NSInteger productID;
+    BOOL areAdsRemoved;
 }
 @end
 
 @implementation ShoppingListVC
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    areAdsRemoved = [[NSUserDefaults standardUserDefaults] boolForKey:@"areAdsRemoved"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    areAdsRemoved = [[NSUserDefaults standardUserDefaults] boolForKey:@"areAdsRemoved"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     productID = 0;
     
@@ -48,7 +60,7 @@
     });
     
     [self getAllShoppingListItems];
-    
+    [self loadAds];
     // Intializing refresh control for Pull-To-Refresh
     refreshControl = [[UIRefreshControl alloc] init];
     [[BaseVC sharedInstance] addRefreshControl:refreshControl
@@ -99,11 +111,11 @@
         long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
         
         [SVProgressHUD showWithStatus:GetAllProductsMsg];
-        
+        [self.view setUserInteractionEnabled:NO];
         [[WebServiceConnector alloc]init:URL_GetShoppingList
                           withParameters:@{
                                            @"user_id":[NSString stringWithFormat:@"%ld",user_id],
-                                           @"role_id":@"1"
+                                           @"role_id":role_id
                                            }
                               withObject:self
                             withSelector:@selector(DisplayResults:)
@@ -121,6 +133,7 @@
 
 - (void)DisplayResults:(id)sender
 {
+    [self.view setUserInteractionEnabled:YES];
     [SVProgressHUD dismiss];
     [refreshControl endRefreshing];
 
@@ -184,7 +197,7 @@
             [[WebServiceConnector alloc]init:URL_GetSearchResultsForText
                               withParameters:@{
                                                @"user_id":[NSString stringWithFormat:@"%ld",user_id],
-                                               @"role_id":@"1",
+                                               @"role_id":role_id,
                                                @"search_text":sender.text
                                                }
                                   withObject:self
@@ -274,7 +287,7 @@
                                      long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
                                      
                                      [SVProgressHUD showWithStatus:DeleteProductFromShoppingListMsg];
-                                     
+                                     [self.view setUserInteractionEnabled:NO];
                                      [[WebServiceConnector alloc]init:URL_DeleteProductFromShoppingList
                                                        withParameters:@{
                                                                         @"user_id":[NSString stringWithFormat:@"%ld",user_id],
@@ -390,7 +403,7 @@
         long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
         
         [SVProgressHUD showWithStatus:CheckShoppingListProductAsBoughtMsg];
-        
+        [self.view setUserInteractionEnabled:NO];
         [[WebServiceConnector alloc]init:URL_CheckShoppingListProductAsBought
                           withParameters:@{
                                            @"user_id":[NSString stringWithFormat:@"%ld",user_id],
@@ -453,15 +466,20 @@
                             _vwPopUp.hidden = YES;
                         }
                         completion:^(BOOL finished){
-                            [self.view endEditing:YES];
-                            [self.mm_drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
+                            
+                            [self.navigationController popViewControllerAnimated:YES];
+//                            [self.view endEditing:YES];
+//                            [self.mm_drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
         }];
     }
     else
     {
-        [self.view endEditing:YES];
-        [self.mm_drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
+         [self.navigationController popViewControllerAnimated:YES];
+//        [self.view endEditing:YES];
+//        [self.mm_drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
     }
+    StoreVC *store = [[StoreVC alloc] init];
+    store.arrShoppingList = arrShoppingList;
 }
 
 - (IBAction)btnAddItemClicked:(id)sender
@@ -500,7 +518,7 @@
                             long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
                             
                             [SVProgressHUD showWithStatus:CheckAllShoppingListProductsAsBoughtMsg];
-                            
+                            [self.view setUserInteractionEnabled:NO];
                             [[WebServiceConnector alloc]init:URL_CheckAllShoppingListProductsAsBought
                                               withParameters:@{
                                                                @"user_id":[NSString stringWithFormat:@"%ld",user_id],
@@ -546,7 +564,7 @@
                                                          long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
                                                          
                                                          [SVProgressHUD showWithStatus:DeleteAllProductsFromShoppingListMsg];
-                                                         
+                                                         [self.view setUserInteractionEnabled:NO];
                                                          [[WebServiceConnector alloc]init:URL_DeleteAllProductsFromShoppingList
                                                                            withParameters:@{
                                                                                             @"user_id":[NSString stringWithFormat:@"%ld",user_id],
@@ -579,7 +597,7 @@
     if (productID == 0)
     {
         NSLog(@"not save");
-        [AZNotification showNotificationWithTitle:@"Please select valid product"
+        [AZNotification showNotificationWithTitle:@"Please select product"
                                        controller:self
                                  notificationType:AZNotificationTypeError];
     }
@@ -590,11 +608,11 @@
             long user_id = [DefaultsValues getIntegerValueFromUserDefaults_ForKey:KEY_USER_ID];
             
             [SVProgressHUD showWithStatus:AddProductInShoppingListMsg];
-            
+            [self.view setUserInteractionEnabled:NO];
             [[WebServiceConnector alloc]init:URL_AddProductInShoppingList
                               withParameters:@{
                                                @"user_id":[NSString stringWithFormat:@"%ld",user_id],
-                                               @"role_id":@"1",
+                                               @"role_id":role_id,
                                                @"product_id":[NSString stringWithFormat:@"%ld",(long)productID]
                                                }
                                   withObject:self
@@ -615,6 +633,7 @@
 
 - (void)DisplayAddResults:(id)sender
 {
+    [self.view setUserInteractionEnabled:YES];
     [SVProgressHUD dismiss];
     if ([sender responseCode] != 100)
     {
@@ -670,4 +689,30 @@
                     }];
 }
 
+#pragma mark - GAD Ads functions
+-(void)loadAds
+{
+    if (areAdsRemoved) {
+        _bannerView.frame = CGRectMake(_bannerView.frame.origin.x, _bannerView.frame.origin.y, _bannerView.frame.size.width, 0);
+        _hideBannerviewConstant = 0;
+        [self.view updateConstraintsIfNeeded];
+    }
+    else
+    {
+        _bannerView.adUnitID = @"ca-app-pub-3940256099942544/2934735716";
+        _bannerView.delegate = self;
+        _bannerView.rootViewController = self;
+        [_bannerView loadRequest:[GADRequest request]];
+    }
+    
+}
+
+- (void)adViewDidReceiveAd:(GADBannerView *)bannerView
+{
+    NSLog(@"Did receive");
+}
+- (void)adView:(GADBannerView *)bannerView didFailToReceiveAdWithError:(GADRequestError *)error
+{
+    NSLog(@"%@", [error localizedDescription]);
+}
 @end

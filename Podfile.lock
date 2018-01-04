@@ -1,4 +1,40 @@
 PODS:
+  - AWSCore (2.6.1)
+  - AWSPolly (2.6.1):
+    - AWSCore (= 2.6.1)
+  - Firebase/AdMob (4.6.0):
+    - Firebase/Core
+    - Google-Mobile-Ads-SDK (= 7.25.0)
+  - Firebase/Core (4.6.0):
+    - FirebaseAnalytics (= 4.0.5)
+    - FirebaseCore (= 4.0.11)
+  - FirebaseAnalytics (4.0.5):
+    - FirebaseCore (~> 4.0)
+    - FirebaseInstanceID (~> 2.0)
+    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
+    - nanopb (~> 0.3)
+  - FirebaseCore (4.0.11):
+    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
+  - FirebaseInstanceID (2.0.6)
+  - Google-Mobile-Ads-SDK (7.25.0)
+  - GoogleToolboxForMac/Defines (2.1.3)
+  - GoogleToolboxForMac/NSData+zlib (2.1.3):
+    - GoogleToolboxForMac/Defines (= 2.1.3)
+  - Mapbox-iOS-SDK (3.6.2)
+  - MapboxCoreNavigation (0.7.0):
+    - MapboxDirections.swift (~> 0.10)
+    - MapboxMobileEvents (~> 0.2)
+    - OSRMTextInstructions (~> 0.3)
+  - MapboxDirections.swift (0.10.4):
+    - Polyline (~> 4.1)
+  - MapboxMobileEvents (0.2.9)
+  - MapboxNavigation (0.7.0):
+    - AWSPolly (~> 2.6)
+    - Mapbox-iOS-SDK (~> 3.6)
+    - MapboxCoreNavigation (= 0.7.0)
+    - Pulley (= 1.4)
+    - SDWebImage (~> 4.1)
+    - Solar (~> 2.0)
   - MMDrawerController (0.5.7):
     - MMDrawerController/Core (= 0.5.7)
     - MMDrawerController/MMDrawerBarButtonItem (= 0.5.7)
@@ -11,13 +47,51 @@ PODS:
     - MMDrawerController/Core
   - MMDrawerController/Subclass (0.5.7):
     - MMDrawerController/Core
+  - nanopb (0.3.8):
+    - nanopb/decode (= 0.3.8)
+    - nanopb/encode (= 0.3.8)
+  - nanopb/decode (0.3.8)
+  - nanopb/encode (0.3.8)
+  - OSRMTextInstructions (0.3.2):
+    - MapboxDirections.swift (~> 0.10)
+  - Polyline (4.1.1)
+  - Popover (1.0.6)
+  - Pulley (1.4)
+  - SDWebImage (4.1.0):
+    - SDWebImage/Core (= 4.1.0)
+  - SDWebImage/Core (4.1.0)
+  - Solar (2.0.0)
 
 DEPENDENCIES:
+  - Firebase/AdMob
+  - Firebase/Core
+  - MapboxNavigation
   - MMDrawerController (~> 0.5.7)
+  - Popover
 
 SPEC CHECKSUMS:
+  AWSCore: e7d37fa0715def975acf1b0d75556576780088b8
+  AWSPolly: a882638c195f94ddffd4b155e5801455aee8b657
+  Firebase: 27321a925aa85520618255a7c630859e0502ccbd
+  FirebaseAnalytics: 5b02a63ead2c3f0259cfc7f15e053e440587ecf8
+  FirebaseCore: 2a946ece8fbe3ce1fdeeb55324f273caade22df9
+  FirebaseInstanceID: 24958382a1011bba5aaff37e334e7a650b9118f5
+  Google-Mobile-Ads-SDK: 113804f266381a30f982ad3c18063d4e0155414f
+  GoogleToolboxForMac: 2501e2ad72a52eb3dfe7bd9aee7dad11b858bd20
+  Mapbox-iOS-SDK: 1224c5ba79dc9bf9a80bfcc33ae320f5d672a42f
+  MapboxCoreNavigation: fa0b93c33751205720c859295e5e45e1da28e6f3
+  MapboxDirections.swift: 7924bcfd50a8851c6972f7cf2f1abaa8acfacb19
+  MapboxMobileEvents: 942320e1784067509c4d456d58cd0a8dbff5ac7c
+  MapboxNavigation: e2adff1c070b9a40901bcb394e68793eacac169e
   MMDrawerController: 7a4cf8e25596bf2434e03ce50d22a8608ddee6a1
+  nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
+  OSRMTextInstructions: 023e93c2f025da166bbe3be43ab2151a900fd42d
+  Polyline: 381d1e699fd12508f97cfc468478dfbab67edf1f
+  Popover: 227aa929a6cdf41c4828786be8ede109c40344c9
+  Pulley: 3d47a5ca819b8f35a63e9a4811d35035d484d1d9
+  SDWebImage: 0e435c14e402a6730315a0fb79f95e68654d55a4
+  Solar: ea092f7660c1b58d2b754227decb61a1c6710826
 
-PODFILE CHECKSUM: ea4ce79b4948cfebb22a5e41261a3aca6f7da298
+PODFILE CHECKSUM: 5536defd8622c55db35595faa46590bd793f0b86
 
-COCOAPODS: 1.0.1
+COCOAPODS: 1.3.1

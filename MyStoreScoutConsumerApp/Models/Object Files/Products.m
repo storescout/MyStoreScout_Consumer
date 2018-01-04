@@ -18,7 +18,6 @@ NSString *const kProductsModified = @"modified";
 NSString *const kProductsStoreId = @"store_id";
 NSString *const kProductsProductName = @"product_name";
 
-
 @interface Products ()
 
 - (id)objectOrNilForKey:(id)aKey fromDictionary:(NSDictionary *)dict;
@@ -36,7 +35,6 @@ NSString *const kProductsProductName = @"product_name";
 @synthesize modified = _modified;
 @synthesize storeId = _storeId;
 @synthesize productName = _productName;
-
 
 + (Products *)modelObjectWithDictionary:(NSDictionary *)dict
 {
